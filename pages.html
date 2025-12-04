@@ -1,53 +1,116 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>pages</title>
+<title>FakeBook - Páginas</title>
 <style>
-body {
-    font-family: Arial;
-    padding: 20px;
-    background: #e9ebee;
-}
-nav {
-    background: white;
-    padding: 10px;
-    border-radius: 10px;
-    margin-bottom: 20px;
-}
-.box {
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-}
-button {
-    padding: 10px;
-    border: none;
-    background: #1877f2;
-    color: white;
-    border-radius: 6px;
-}
+body { margin:0; font-family: Arial, sans-serif; background:#f0f2f5; }
+header { background:#1877f2; color:white; padding:10px 20px; font-size:24px; }
+.container { max-width:800px; margin:20px auto; display:flex; gap:20px; }
+.pages-list { flex:1; background:white; padding:15px; border-radius:10px; max-height:500px; overflow-y:auto; }
+.page-details { flex:2; background:white; padding:15px; border-radius:10px; max-height:500px; display:flex; flex-direction:column; }
+.page { padding:10px; border-bottom:1px solid #ccc; cursor:pointer; }
+.post { background:#f0f0f0; padding:10px; border-radius:6px; margin-bottom:10px; }
+input, textarea { width:100%; padding:5px; margin-top:5px; border-radius:5px; border:1px solid #ccc; }
+button { padding:5px 10px; margin-top:5px; border:none; border-radius:5px; background:#1877f2; color:white; cursor:pointer; }
 </style>
 </head>
 <body>
 
-<nav><a href="index.html">index</a> | <a href="login.html">login</a> | <a href="signup.html">signup</a> | <a href="profile.html">profile</a> | <a href="settings.html">settings</a> | <a href="post.html">post</a> | <a href="friends.html">friends</a> | <a href="followers.html">followers</a> | <a href="messages.html">messages</a> | <a href="groups.html">groups</a> | <a href="group.html">group</a> | <a href="pages.html">pages</a> | <a href="page.html">page</a> | <a href="stories.html">stories</a> | <a href="media.html">media</a> | <a href="notifications.html">notifications</a> | <a href="feed.html">feed</a> | </nav>
+<header>FakeBook - Páginas</header>
 
-<div class="box">
-<h2>pages.html</h2>
+<div class="container">
+<div class="pages-list">
+<h3>Páginas</h3>
+<div id="pages-list"></div>
+<h4>Criar Página</h4>
+<input type="text" id="page-name" placeholder="Nome da página">
+<input type="text" id="page-category" placeholder="Categoria">
+<input type="text" id="page-desc" placeholder="Descrição">
+<button onclick="createPage()">Criar</button>
+</div>
 
-<button onclick="testSupabase()">TESTAR SUPABASE</button>
-<pre id="out"></pre>
-
+<div class="page-details">
+<h3 id="selected-page-name">Selecione uma página</h3>
+<div id="page-posts" style="flex:1; overflow-y:auto;"></div>
+<textarea id="post-content" placeholder="Escreva algo na página..."></textarea>
+<input type="text" id="post-media" placeholder="URL de mídia (opcional)">
+<button onclick="createPagePost()">Postar</button>
+</div>
 </div>
 
 <script src="https://unpkg.com/@supabase/supabase-js/umd/supabase.js"></script>
 <script>
-const supabase = Supabase.createClient("https://umzlriwvexvaabliriva.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtemxyaXd2ZXh2YWFibGlyaXZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ4NjEwMjQsImV4cCI6MjA4MDQzNzAyNH0.8miF7Z0e2sTduJhveCk-6GKzroS0CYF-PS6BZeEKpEI");
-async function testSupabase() {
-    const { data, error } = await supabase.from('users').select('*').limit(5);
-    document.getElementById("out").innerText = JSON.stringify({data, error}, null, 2);
+const supabaseUrl = "https://umzlriwvexvaabliriva.supabase.co";
+const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtemxyaXd2ZXh2YWFibGlyaXZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ4NjEwMjQsImV4cCI6MjA4MDQzNzAyNH0.8miF7Z0e2sTduJhveCk-6GKzroS0CYF-PS6BZeEKpEI";
+const supabase = Supabase.createClient(supabaseUrl, supabaseKey);
+
+const user_id = localStorage.getItem('user_id');
+if(!user_id){ window.location.href='login.html'; }
+
+let selectedPage = null;
+
+// carregar páginas
+async function loadPages(){
+    const { data, error } = await supabase.from('pages').select('*').order('criado_em',{ascending:false});
+    const list = document.getElementById('pages-list');
+    list.innerHTML='';
+    data.forEach(p=>{
+        const div = document.createElement('div');
+        div.className='page';
+        div.innerText = p.nome + ' (' + p.categoria + ')';
+        div.onclick = ()=>{ selectPage(p.id, p.nome); };
+        list.appendChild(div);
+    });
 }
+
+// selecionar página
+function selectPage(id, name){
+    selectedPage = id;
+    document.getElementById('selected-page-name').innerText = name;
+    loadPagePosts();
+}
+
+// criar página
+async function createPage(){
+    const nome = document.getElementById('page-name').value.trim();
+    const categoria = document.getElementById('page-category').value.trim();
+    const descricao = document.getElementById('page-desc').value.trim();
+    if(!nome) return alert('Digite o nome da página');
+    await supabase.from('pages').insert([{nome, categoria, descricao}]);
+    document.getElementById('page-name').value='';
+    document.getElementById('page-category').value='';
+    document.getElementById('page-desc').value='';
+    loadPages();
+}
+
+// carregar posts da página
+async function loadPagePosts(){
+    if(!selectedPage) return;
+    const { data, error } = await supabase.from('page_posts').select('*').eq('page_id', selectedPage).order('criado_em',{ascending:false});
+    const container = document.getElementById('page-posts');
+    container.innerHTML='';
+    data.forEach(p=>{
+        const div = document.createElement('div');
+        div.className='post';
+        div.innerHTML = `<p>${p.conteudo}</p>${p.midia_url?'<img src="'+p.midia_url+'" width="100%">':''}`;
+        container.appendChild(div);
+    });
+}
+
+// criar post na página
+async function createPagePost(){
+    if(!selectedPage) return alert('Selecione uma página');
+    const conteudo = document.getElementById('post-content').value.trim();
+    const midia_url = document.getElementById('post-media').value.trim();
+    if(!conteudo && !midia_url) return alert('Digite algo ou insira mídia');
+    await supabase.from('page_posts').insert([{page_id:selectedPage, user_id, conteudo, midia_url}]);
+    document.getElementById('post-content').value='';
+    document.getElementById('post-media').value='';
+    loadPagePosts();
+}
+
+loadPages();
 </script>
 
 </body>
