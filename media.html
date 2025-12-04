@@ -1,53 +1,81 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>media</title>
+<title>FakeBook - Mídia</title>
 <style>
-body {
-    font-family: Arial;
-    padding: 20px;
-    background: #e9ebee;
-}
-nav {
-    background: white;
-    padding: 10px;
-    border-radius: 10px;
-    margin-bottom: 20px;
-}
-.box {
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-}
-button {
-    padding: 10px;
-    border: none;
-    background: #1877f2;
-    color: white;
-    border-radius: 6px;
-}
+body { margin:0; font-family: Arial, sans-serif; background:#f0f2f5; }
+header { background:#1877f2; color:white; padding:10px 20px; font-size:24px; }
+.container { max-width:800px; margin:20px auto; background:white; padding:20px; border-radius:10px; }
+.media-item { margin-bottom:15px; }
+img, video { max-width:100%; border-radius:6px; display:block; margin-bottom:5px; }
+button { padding:5px 10px; border:none; border-radius:5px; background:#1877f2; color:white; cursor:pointer; }
 </style>
 </head>
 <body>
 
-<nav><a href="index.html">index</a> | <a href="login.html">login</a> | <a href="signup.html">signup</a> | <a href="profile.html">profile</a> | <a href="settings.html">settings</a> | <a href="post.html">post</a> | <a href="friends.html">friends</a> | <a href="followers.html">followers</a> | <a href="messages.html">messages</a> | <a href="groups.html">groups</a> | <a href="group.html">group</a> | <a href="pages.html">pages</a> | <a href="page.html">page</a> | <a href="stories.html">stories</a> | <a href="media.html">media</a> | <a href="notifications.html">notifications</a> | <a href="feed.html">feed</a> | </nav>
+<header>FakeBook - Mídia</header>
 
-<div class="box">
-<h2>media.html</h2>
+<div class="container">
+<h3>Suas Mídias</h3>
+<div id="media-list"></div>
 
-<button onclick="testSupabase()">TESTAR SUPABASE</button>
-<pre id="out"></pre>
-
+<h3>Adicionar Mídia</h3>
+<input type="text" id="media-url" placeholder="URL da imagem ou vídeo">
+<select id="media-type">
+<option value="image">Imagem</option>
+<option value="video">Vídeo</option>
+</select>
+<input type="text" id="media-origem" placeholder="Origem: post/story/perfil">
+<button onclick="addMedia()">Adicionar</button>
 </div>
 
 <script src="https://unpkg.com/@supabase/supabase-js/umd/supabase.js"></script>
 <script>
-const supabase = Supabase.createClient("https://umzlriwvexvaabliriva.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtemxyaXd2ZXh2YWFibGlyaXZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ4NjEwMjQsImV4cCI6MjA4MDQzNzAyNH0.8miF7Z0e2sTduJhveCk-6GKzroS0CYF-PS6BZeEKpEI");
-async function testSupabase() {
-    const { data, error } = await supabase.from('users').select('*').limit(5);
-    document.getElementById("out").innerText = JSON.stringify({data, error}, null, 2);
+const supabaseUrl = "https://umzlriwvexvaabliriva.supabase.co";
+const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtemxyaXd2ZXh2YWFibGlyaXZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ4NjEwMjQsImV4cCI6MjA4MDQzNzAyNH0.8miF7Z0e2sTduJhveCk-6GKzroS0CYF-PS6BZeEKpEI";
+const supabase = Supabase.createClient(supabaseUrl, supabaseKey);
+
+const user_id = localStorage.getItem('user_id');
+if(!user_id){ window.location.href='login.html'; }
+
+// carregar mídias
+async function loadMedia(){
+    const { data, error } = await supabase.from('media').select('*').eq('user_id', user_id).order('criado_em',{ascending:false});
+    const container = document.getElementById('media-list');
+    container.innerHTML='';
+    if(error){ container.innerHTML='Erro ao carregar mídias'; return; }
+    data.forEach(m=>{
+        const div = document.createElement('div');
+        div.className='media-item';
+        if(m.tipo=='image'){
+            div.innerHTML = `<img src="${m.url}">Origem: ${m.origem} <button onclick="deleteMedia(${m.id})">Excluir</button>`;
+        } else if(m.tipo=='video'){
+            div.innerHTML = `<video controls src="${m.url}"></video>Origem: ${m.origem} <button onclick="deleteMedia(${m.id})">Excluir</button>`;
+        }
+        container.appendChild(div);
+    });
 }
+
+// adicionar mídia
+async function addMedia(){
+    const url = document.getElementById('media-url').value.trim();
+    const tipo = document.getElementById('media-type').value;
+    const origem = document.getElementById('media-origem').value.trim();
+    if(!url || !tipo || !origem) return alert('Preencha todos os campos');
+    await supabase.from('media').insert([{user_id, url, tipo, origem}]);
+    document.getElementById('media-url').value='';
+    document.getElementById('media-origem').value='';
+    loadMedia();
+}
+
+// excluir mídia
+async function deleteMedia(id){
+    await supabase.from('media').delete().eq('id', id);
+    loadMedia();
+}
+
+loadMedia();
 </script>
 
 </body>
