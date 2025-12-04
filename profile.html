@@ -1,53 +1,106 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>profile</title>
+<title>FakeBook - Perfil</title>
 <style>
-body {
-    font-family: Arial;
-    padding: 20px;
-    background: #e9ebee;
-}
-nav {
-    background: white;
-    padding: 10px;
-    border-radius: 10px;
-    margin-bottom: 20px;
-}
-.box {
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-}
-button {
-    padding: 10px;
-    border: none;
-    background: #1877f2;
-    color: white;
-    border-radius: 6px;
-}
+body { margin:0; font-family: Arial, sans-serif; background:#f0f2f5; }
+header { background:#1877f2; color:white; padding:10px 20px; font-size:24px; }
+.container { display:flex; padding:20px; gap:20px; }
+.profile { flex:3; }
+.sidebar { flex:1; background:white; padding:15px; border-radius:10px; height:fit-content; }
+.post { background:white; padding:15px; border-radius:10px; margin-bottom:15px; }
+button { padding:5px 10px; border:none; border-radius:5px; cursor:pointer; margin-right:5px; }
 </style>
 </head>
 <body>
 
-<nav><a href="index.html">index</a> | <a href="login.html">login</a> | <a href="signup.html">signup</a> | <a href="profile.html">profile</a> | <a href="settings.html">settings</a> | <a href="post.html">post</a> | <a href="friends.html">friends</a> | <a href="followers.html">followers</a> | <a href="messages.html">messages</a> | <a href="groups.html">groups</a> | <a href="group.html">group</a> | <a href="pages.html">pages</a> | <a href="page.html">page</a> | <a href="stories.html">stories</a> | <a href="media.html">media</a> | <a href="notifications.html">notifications</a> | <a href="feed.html">feed</a> | </nav>
+<header>FakeBook - Perfil</header>
 
-<div class="box">
-<h2>profile.html</h2>
-
-<button onclick="testSupabase()">TESTAR SUPABASE</button>
-<pre id="out"></pre>
-
+<div class="container">
+    <div class="profile">
+        <h2 id="user-name">Usuário</h2>
+        <h3>Posts</h3>
+        <div id="user-posts"></div>
+        <h3>Stories</h3>
+        <div id="user-stories"></div>
+    </div>
+    <div class="sidebar">
+        <h3>Menu</h3>
+        <button onclick="goTo('feed')">Feed</button>
+        <button onclick="goTo('friends')">Amigos</button>
+        <button onclick="goTo('messages')">Mensagens</button>
+        <button onclick="goTo('settings')">Configurações</button>
+        <button onclick="goTo('notifications')">Notificações</button>
+    </div>
 </div>
 
 <script src="https://unpkg.com/@supabase/supabase-js/umd/supabase.js"></script>
 <script>
-const supabase = Supabase.createClient("https://umzlriwvexvaabliriva.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtemxyaXd2ZXh2YWFibGlyaXZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ4NjEwMjQsImV4cCI6MjA4MDQzNzAyNH0.8miF7Z0e2sTduJhveCk-6GKzroS0CYF-PS6BZeEKpEI");
-async function testSupabase() {
-    const { data, error } = await supabase.from('users').select('*').limit(5);
-    document.getElementById("out").innerText = JSON.stringify({data, error}, null, 2);
+const supabaseUrl = "https://umzlriwvexvaabliriva.supabase.co";
+const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtemxyaXd2ZXh2YWFibGlyaXZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ4NjEwMjQsImV4cCI6MjA4MDQzNzAyNH0.8miF7Z0e2sTduJhveCk-6GKzroS0CYF-PS6BZeEKpEI";
+const supabase = Supabase.createClient(supabaseUrl, supabaseKey);
+
+// usuário logado
+const user_id = localStorage.getItem('user_id');
+if(!user_id){ window.location.href='login.html'; }
+
+function goTo(page){ window.location.href = page+".html"; }
+
+// carregar informações do usuário
+async function loadUser(){
+    const { data, error } = await supabase.from('users').select('*').eq('id',user_id).single();
+    if(error) { alert('Erro ao carregar perfil'); return; }
+    document.getElementById('user-name').innerText = data.nome + ' ' + data.sobrenome;
 }
+
+// carregar posts do usuário
+async function loadPosts(){
+    const { data, error } = await supabase.from('posts').select('*').eq('user_id', user_id).order('criado_em',{ascending:false});
+    const container = document.getElementById('user-posts');
+    container.innerHTML='';
+    if(error) { container.innerHTML='Erro ao carregar posts'; return; }
+    data.forEach(p=>{
+        const div = document.createElement('div');
+        div.className='post';
+        div.innerHTML = `<p>${p.conteudo}</p>${p.midia_url?'<img src="'+p.midia_url+'" width="100%">':''}
+        <button onclick="likePost(${p.id})">Curtir</button>
+        <button onclick="commentPost(${p.id})">Comentar</button>`;
+        container.appendChild(div);
+    });
+}
+
+// carregar stories do usuário
+async function loadStories(){
+    const { data, error } = await supabase.from('stories').select('*').eq('user_id', user_id).order('criado_em',{ascending:false});
+    const container = document.getElementById('user-stories');
+    container.innerHTML='';
+    if(error) { container.innerHTML='Erro ao carregar stories'; return; }
+    data.forEach(s=>{
+        const div = document.createElement('div');
+        div.className='post';
+        div.innerHTML = `<img src="${s.midia_url}" width="100%"><p>${s.legenda || ''}</p>`;
+        container.appendChild(div);
+    });
+}
+
+// Curtir post
+async function likePost(postId){
+    await supabase.from('post_likes').insert([{post_id: postId, user_id}]);
+    loadPosts();
+}
+
+// Comentar post
+async function commentPost(postId){
+    const conteudo = prompt('Digite seu comentário:');
+    if(!conteudo) return;
+    await supabase.from('comments').insert([{post_id:postId,user_id,conteudo}]);
+    loadPosts();
+}
+
+loadUser();
+loadPosts();
+loadStories();
 </script>
 
 </body>
