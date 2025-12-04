@@ -10,6 +10,7 @@ input, select { width:100%; padding:10px; margin:8px 0; border-radius:6px; borde
 button { width:100%; padding:10px; border:none; background:#1877f2; color:white; border-radius:6px; cursor:pointer; margin-top:10px; }
 p { font-size:14px; text-align:center; }
 p a { color:#1877f2; text-decoration:none; }
+pre { font-size:12px; color:red; }
 </style>
 </head>
 <body>
@@ -53,64 +54,77 @@ const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS
 const supabase = Supabase.createClient(supabaseUrl, supabaseKey);
 
 async function signup(){
-    const nome = document.getElementById('nome').value.trim();
-    const sobrenome = document.getElementById('sobrenome').value.trim();
-    const username = document.getElementById('username').value.trim();
-    const email = document.getElementById('email').value.trim();
-    const telefone = document.getElementById('telefone').value.trim();
-    const senha = document.getElementById('senha').value.trim();
-    const bio = document.getElementById('bio').value.trim();
-    const avatar_url = document.getElementById('avatar_url').value.trim();
-    const capa_url = document.getElementById('capa_url').value.trim();
-    const genero = document.getElementById('genero').value;
-    const aniversario = document.getElementById('aniversario').value || null;
-    const cidade = document.getElementById('cidade').value.trim();
-    const cidade_origem = document.getElementById('cidade_origem').value.trim();
-    const relacionamento = document.getElementById('relacionamento').value;
+    try {
+        const nome = document.getElementById('nome').value.trim();
+        const sobrenome = document.getElementById('sobrenome').value.trim();
+        const username = document.getElementById('username').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const telefone = document.getElementById('telefone').value.trim();
+        const senha = document.getElementById('senha').value.trim();
+        const bio = document.getElementById('bio').value.trim();
+        const avatar_url = document.getElementById('avatar_url').value.trim();
+        const capa_url = document.getElementById('capa_url').value.trim();
+        const genero = document.getElementById('genero').value;
+        const aniversario = document.getElementById('aniversario').value || null;
+        const cidade = document.getElementById('cidade').value.trim();
+        const cidade_origem = document.getElementById('cidade_origem').value.trim();
+        const relacionamento = document.getElementById('relacionamento').value;
 
-    if(!username || !email || !senha){ 
-        document.getElementById('msg').innerText='Preencha os campos obrigatórios (*)'; 
-        return; 
+        if(!username || !email || !senha){
+            document.getElementById('msg').innerText='Preencha os campos obrigatórios (*)';
+            return;
+        }
+
+        // Verifica duplicados
+        const { data: exists, error: existsError } = await supabase
+            .from('users')
+            .select('id')
+            .or(`username.eq.${username},email.eq.${email}`)
+            .limit(1);
+
+        if(existsError){ 
+            console.error(existsError); 
+            document.getElementById('msg').innerText='Erro ao verificar duplicados'; 
+            return; 
+        }
+        if(exists.length > 0){ 
+            document.getElementById('msg').innerText='Usuário ou email já existe'; 
+            return; 
+        }
+
+        // Inserção completa
+        const { data, error } = await supabase.from('users').insert([{
+            nome,
+            sobrenome,
+            username,
+            email,
+            telefone,
+            senha_hash: senha,
+            bio,
+            avatar_url,
+            capa_url,
+            genero,
+            aniversario,
+            cidade,
+            cidade_origem,
+            relacionamento,
+            email_verificado: false,
+            telefone_verificado: false
+        }]);
+
+        if(error){ 
+            console.error(error); 
+            document.getElementById('msg').innerText='Erro ao cadastrar: '+error.message; 
+            return; 
+        }
+
+        console.log('Cadastro realizado:', data);
+        alert('Cadastro realizado com sucesso!');
+        window.location.href='login.html';
+    } catch(err){
+        console.error('Erro inesperado:', err);
+        document.getElementById('msg').innerText='Erro inesperado: '+err.message;
     }
-
-    // Verifica duplicado
-    const { data: exists } = await supabase
-        .from('users')
-        .select('id')
-        .or(`username.eq.${username},email.eq.${email}`)
-        .limit(1);
-    if(exists.length>0){ 
-        document.getElementById('msg').innerText='Usuário ou email já existe'; 
-        return; 
-    }
-
-    // Inserção completa
-    const { data, error } = await supabase.from('users').insert([{
-        nome,
-        sobrenome,
-        username,
-        email,
-        telefone,
-        senha_hash: senha,
-        bio,
-        avatar_url,
-        capa_url,
-        genero,
-        aniversario,
-        cidade,
-        cidade_origem,
-        relacionamento,
-        email_verificado: false,
-        telefone_verificado: false
-    }]);
-
-    if(error){ 
-        document.getElementById('msg').innerText='Erro: '+error.message; 
-        return; 
-    }
-
-    alert('Cadastro realizado! Faça login.');
-    window.location.href='login.html';
 }
 </script>
 
