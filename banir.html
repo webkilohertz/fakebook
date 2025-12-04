@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Painel de Banimento (Somente Leitura)</title>
+
+<style>
+    body {
+        background: #111;
+        color: #fff;
+        font-family: Arial, sans-serif;
+        padding: 40px;
+    }
+
+    h1 {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .box {
+        max-width: 500px;
+        margin: 0 auto;
+        background: #1e1e1e;
+        padding: 25px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px #000;
+    }
+
+    input {
+        width: 100%;
+        padding: 12px;
+        border-radius: 8px;
+        border: none;
+        margin-bottom: 15px;
+        background: #222;
+        color: #fff;
+    }
+
+    button {
+        width: 100%;
+        padding: 12px;
+        border: none;
+        background: #0072ff;
+        color: #fff;
+        font-size: 17px;
+        font-weight: bold;
+        border-radius: 8px;
+        cursor: pointer;
+        margin-bottom: 10px;
+        transition: 0.2s;
+    }
+
+    button:hover { opacity: 0.8; }
+
+    pre {
+        background: #000;
+        padding: 15px;
+        border-radius: 8px;
+        margin-top: 20px;
+        max-height: 300px;
+        overflow-y: auto;
+    }
+
+    .banido { color: #ff4d4d; font-weight: bold; }
+    .ok { color: #4dff88; font-weight: bold; }
+</style>
+</head>
+<body>
+
+<h1>Painel de Banimento (Somente Leitura)</h1>
+
+<div class="box">
+    <input id="userId" type="text" placeholder="Digite o ID do usuário">
+    <button onclick="verificar()">Verificar Banimento</button>
+
+    <pre id="result"></pre>
+    <h3>Lista de Banidos:</h3>
+    <pre id="listaBanidos"></pre>
+</div>
+
+<script>
+let banlist = { banidos: [] };
+
+// Carrega o JSON da raiz
+async function carregarBanlist() {
+    try {
+        const res = await fetch('banlist.json');
+        if (!res.ok) throw new Error('Não foi possível carregar banlist.json');
+        banlist = await res.json();
+        mostrarListaBanidos();
+    } catch (err) {
+        document.getElementById('result').innerText = err.message;
+    }
+}
+
+// Mostra a lista completa de banidos
+function mostrarListaBanidos() {
+    if (!banlist.banidos || banlist.banidos.length === 0) {
+        document.getElementById('listaBanidos').innerText = 'Nenhum usuário banido.';
+    } else {
+        document.getElementById('listaBanidos').innerText = banlist.banidos.join('\n');
+    }
+}
+
+// Verifica se o ID digitado está banido
+function verificar() {
+    const id = document.getElementById('userId').value.trim();
+    if (!id) {
+        alert('Digite um ID');
+        return;
+    }
+
+    const status = banlist.banidos.includes(id) ? 'BANIDO' : 'LIBERADO';
+    const classe = banlist.banidos.includes(id) ? 'banido' : 'ok';
+    document.getElementById('result').innerHTML = `Usuário ${id}: <span class="${classe}">${status}</span>`;
+}
+
+// Inicializa
+carregarBanlist();
+</script>
+
+</body>
+</html>
