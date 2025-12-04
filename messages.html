@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>messages</title>
+<style>
+body {
+    font-family: Arial;
+    padding: 20px;
+    background: #e9ebee;
+}
+nav {
+    background: white;
+    padding: 10px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+.box {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+}
+button {
+    padding: 10px;
+    border: none;
+    background: #1877f2;
+    color: white;
+    border-radius: 6px;
+}
+</style>
+</head>
+<body>
+
+<nav><a href="index.html">index</a> | <a href="login.html">login</a> | <a href="signup.html">signup</a> | <a href="profile.html">profile</a> | <a href="settings.html">settings</a> | <a href="post.html">post</a> | <a href="friends.html">friends</a> | <a href="followers.html">followers</a> | <a href="messages.html">messages</a> | <a href="groups.html">groups</a> | <a href="group.html">group</a> | <a href="pages.html">pages</a> | <a href="page.html">page</a> | <a href="stories.html">stories</a> | <a href="media.html">media</a> | <a href="notifications.html">notifications</a> | <a href="feed.html">feed</a> | </nav>
+
+<div class="box">
+<h2>messages.html</h2>
+
+<button onclick="testSupabase()">TESTAR SUPABASE</button>
+<pre id="out"></pre>
+
+</div>
+
+<script src="https://unpkg.com/@supabase/supabase-js/umd/supabase.js"></script>
+<script>
+const supabase = Supabase.createClient("https://umzlriwvexvaabliriva.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtemxyaXd2ZXh2YWFibGlyaXZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ4NjEwMjQsImV4cCI6MjA4MDQzNzAyNH0.8miF7Z0e2sTduJhveCk-6GKzroS0CYF-PS6BZeEKpEI");
+async function testSupabase() {
+    const { data, error } = await supabase.from('users').select('*').limit(5);
+    document.getElementById("out").innerText = JSON.stringify({data, error}, null, 2);
+}
+</script>
+
+</body>
+</html>
