@@ -1,53 +1,81 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>post</title>
+<title>FakeBook - Post</title>
 <style>
-body {
-    font-family: Arial;
-    padding: 20px;
-    background: #e9ebee;
-}
-nav {
-    background: white;
-    padding: 10px;
-    border-radius: 10px;
-    margin-bottom: 20px;
-}
-.box {
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-}
-button {
-    padding: 10px;
-    border: none;
-    background: #1877f2;
-    color: white;
-    border-radius: 6px;
-}
+body { margin:0; font-family: Arial, sans-serif; background:#f0f2f5; }
+header { background:#1877f2; color:white; padding:10px 20px; font-size:24px; }
+.container { max-width:600px; margin:20px auto; }
+input, textarea { width:100%; padding:10px; margin:10px 0; border-radius:6px; border:1px solid #ccc; }
+button { padding:10px 15px; border:none; background:#1877f2; color:white; border-radius:6px; cursor:pointer; margin-right:5px; }
+.post { background:white; padding:15px; border-radius:10px; margin-bottom:15px; }
+img { max-width:100%; margin-top:10px; border-radius:6px; }
 </style>
 </head>
 <body>
 
-<nav><a href="index.html">index</a> | <a href="login.html">login</a> | <a href="signup.html">signup</a> | <a href="profile.html">profile</a> | <a href="settings.html">settings</a> | <a href="post.html">post</a> | <a href="friends.html">friends</a> | <a href="followers.html">followers</a> | <a href="messages.html">messages</a> | <a href="groups.html">groups</a> | <a href="group.html">group</a> | <a href="pages.html">pages</a> | <a href="page.html">page</a> | <a href="stories.html">stories</a> | <a href="media.html">media</a> | <a href="notifications.html">notifications</a> | <a href="feed.html">feed</a> | </nav>
+<header>FakeBook - Criar Post</header>
 
-<div class="box">
-<h2>post.html</h2>
+<div class="container">
+<h2>Novo Post</h2>
+<textarea id="conteudo" placeholder="O que você está pensando?"></textarea>
+<input type="text" id="midia_url" placeholder="URL da imagem/vídeo (opcional)">
+<button onclick="createPost()">Postar</button>
 
-<button onclick="testSupabase()">TESTAR SUPABASE</button>
-<pre id="out"></pre>
-
+<h2>Seus Posts</h2>
+<div id="user-posts"></div>
 </div>
 
 <script src="https://unpkg.com/@supabase/supabase-js/umd/supabase.js"></script>
 <script>
-const supabase = Supabase.createClient("https://umzlriwvexvaabliriva.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtemxyaXd2ZXh2YWFibGlyaXZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ4NjEwMjQsImV4cCI6MjA4MDQzNzAyNH0.8miF7Z0e2sTduJhveCk-6GKzroS0CYF-PS6BZeEKpEI");
-async function testSupabase() {
-    const { data, error } = await supabase.from('users').select('*').limit(5);
-    document.getElementById("out").innerText = JSON.stringify({data, error}, null, 2);
+const supabaseUrl = "https://umzlriwvexvaabliriva.supabase.co";
+const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtemxyaXd2ZXh2YWFibGlyaXZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ4NjEwMjQsImV4cCI6MjA4MDQzNzAyNH0.8miF7Z0e2sTduJhveCk-6GKzroS0CYF-PS6BZeEKpEI";
+const supabase = Supabase.createClient(supabaseUrl, supabaseKey);
+
+const user_id = localStorage.getItem('user_id');
+if(!user_id){ window.location.href='login.html'; }
+
+// criar novo post
+async function createPost(){
+    const conteudo = document.getElementById('conteudo').value.trim();
+    const midia_url = document.getElementById('midia_url').value.trim();
+    if(!conteudo && !midia_url){ alert('Digite conteúdo ou insira mídia'); return; }
+    const { data, error } = await supabase.from('posts').insert([{user_id, conteudo, midia_url}]);
+    if(error) alert('Erro ao postar'); else { document.getElementById('conteudo').value=''; document.getElementById('midia_url').value=''; loadPosts(); }
 }
+
+// carregar posts do usuário
+async function loadPosts(){
+    const { data, error } = await supabase.from('posts').select('*').eq('user_id', user_id).order('criado_em',{ascending:false});
+    const container = document.getElementById('user-posts');
+    container.innerHTML='';
+    if(error) { container.innerHTML='Erro ao carregar posts'; return; }
+    data.forEach(p=>{
+        const div = document.createElement('div');
+        div.className='post';
+        div.innerHTML = `<p>${p.conteudo}</p>${p.midia_url?'<img src="'+p.midia_url+'">':''}
+        <button onclick="likePost(${p.id})">Curtir</button>
+        <button onclick="commentPost(${p.id})">Comentar</button>`;
+        container.appendChild(div);
+    });
+}
+
+// Curtir post
+async function likePost(postId){
+    await supabase.from('post_likes').insert([{post_id:postId, user_id}]);
+    loadPosts();
+}
+
+// Comentar post
+async function commentPost(postId){
+    const conteudo = prompt('Digite seu comentário:');
+    if(!conteudo) return;
+    await supabase.from('comments').insert([{post_id, user_id, conteudo}]);
+    loadPosts();
+}
+
+loadPosts();
 </script>
 
 </body>
