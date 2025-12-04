@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Destruir Usuário</title>
+
+<style>
+    body {
+        background: #111;
+        color: #fff;
+        font-family: Arial, sans-serif;
+        padding: 40px;
+    }
+
+    h1 {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .box {
+        max-width: 450px;
+        margin: 0 auto;
+        background: #1e1e1e;
+        padding: 25px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px #000;
+    }
+
+    input {
+        width: 100%;
+        padding: 12px;
+        border-radius: 8px;
+        border: none;
+        margin-bottom: 15px;
+        background: #222;
+        color: #fff;
+    }
+
+    button {
+        width: 100%;
+        padding: 12px;
+        border: none;
+        background: #d40000;
+        color: #fff;
+        font-size: 17px;
+        font-weight: bold;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    button:hover {
+        background: #ff0000;
+    }
+
+    pre {
+        background: #000;
+        padding: 15px;
+        border-radius: 8px;
+        margin-top: 20px;
+        max-height: 300px;
+        overflow-y: auto;
+    }
+</style>
+</head>
+<body>
+
+<h1>DESTRUIR USUÁRIO</h1>
+
+<div class="box">
+    <input id="userId" type="text" placeholder="ID do usuário">
+
+    <button onclick="destruirTudo()">
+        APAGAR TUDO DESTE USUÁRIO
+    </button>
+
+    <pre id="result"></pre>
+</div>
+
+<script type="module">
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+const supabase = createClient(
+    "https://umzlriwvexvaabliriva.supabase.co",
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtemxyaXd2ZXh2YWFibGlyaXZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ4NjEwMjQsImV4cCI6MjA4MDQzNzAyNH0.8miF7Z0e2sTduJhveCk-6GKzroS0CYF-PS6BZeEKpEI"
+);
+
+async function destruirTabela(nomeTabela, coluna, id) {
+    return await supabase
+        .from(nomeTabela)
+        .delete()
+        .eq(coluna, id);
+}
+
+async function destruirTudo() {
+    const id = document.getElementById("userId").value;
+    if (!id) {
+        alert("Coloque o ID do usuário");
+        return;
+    }
+
+    let logs = [];
+
+    // LISTA DAS TABELAS QUE QUER APAGAR
+    const tabelas = [
+        ["users", "id"],
+        ["posts", "user_id"],
+        ["stories", "user_id"],
+        ["pages", "user_id"],
+        ["groups", "owner_id"],
+        ["messages", "sender_id"],
+        ["messages", "receiver_id"],
+        ["feed", "user_id"],
+        ["followers", "user_id"],
+        ["followers", "follower_id"],
+        ["comments", "user_id"],
+        ["likes", "user_id"]
+    ];
+
+    for (let t of tabelas) {
+        const tabela = t[0];
+        const coluna = t[1];
+
+        const r = await destruirTabela(tabela, coluna, id);
+        logs.push(`Tabela ${tabela}: ${JSON.stringify(r, null, 2)}`);
+    }
+
+    document.getElementById("result").innerText = logs.join("\n\n");
+}
+</script>
+
+</body>
+</html>
