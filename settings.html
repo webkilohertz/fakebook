@@ -1,53 +1,69 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>settings</title>
+<title>FakeBook - Configurações</title>
 <style>
-body {
-    font-family: Arial;
-    padding: 20px;
-    background: #e9ebee;
-}
-nav {
-    background: white;
-    padding: 10px;
-    border-radius: 10px;
-    margin-bottom: 20px;
-}
-.box {
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-}
-button {
-    padding: 10px;
-    border: none;
-    background: #1877f2;
-    color: white;
-    border-radius: 6px;
-}
+body { margin:0; font-family: Arial, sans-serif; background:#f0f2f5; }
+header { background:#1877f2; color:white; padding:10px 20px; font-size:24px; }
+.container { max-width:500px; margin:20px auto; background:white; padding:20px; border-radius:10px; }
+label { display:block; margin:10px 0; font-weight:bold; }
+input[type=checkbox], select { margin-top:5px; }
+button { margin-top:20px; padding:10px 15px; border:none; background:#1877f2; color:white; border-radius:6px; cursor:pointer; }
 </style>
 </head>
 <body>
 
-<nav><a href="index.html">index</a> | <a href="login.html">login</a> | <a href="signup.html">signup</a> | <a href="profile.html">profile</a> | <a href="settings.html">settings</a> | <a href="post.html">post</a> | <a href="friends.html">friends</a> | <a href="followers.html">followers</a> | <a href="messages.html">messages</a> | <a href="groups.html">groups</a> | <a href="group.html">group</a> | <a href="pages.html">pages</a> | <a href="page.html">page</a> | <a href="stories.html">stories</a> | <a href="media.html">media</a> | <a href="notifications.html">notifications</a> | <a href="feed.html">feed</a> | </nav>
+<header>FakeBook - Configurações</header>
 
-<div class="box">
-<h2>settings.html</h2>
+<div class="container">
+<h2>Configurações de Conta</h2>
 
-<button onclick="testSupabase()">TESTAR SUPABASE</button>
-<pre id="out"></pre>
-
+<label>Modo Escuro <input type="checkbox" id="darkMode"></label>
+<label>Notificações <input type="checkbox" id="notifications"></label>
+<label>Privacidade do Perfil
+<select id="privacy">
+<option value="publico">Público</option>
+<option value="amigos">Amigos</option>
+<option value="privado">Privado</option>
+</select>
+</label>
+<button onclick="saveSettings()">Salvar</button>
+<pre id="msg"></pre>
 </div>
 
 <script src="https://unpkg.com/@supabase/supabase-js/umd/supabase.js"></script>
 <script>
-const supabase = Supabase.createClient("https://umzlriwvexvaabliriva.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtemxyaXd2ZXh2YWFibGlyaXZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ4NjEwMjQsImV4cCI6MjA4MDQzNzAyNH0.8miF7Z0e2sTduJhveCk-6GKzroS0CYF-PS6BZeEKpEI");
-async function testSupabase() {
-    const { data, error } = await supabase.from('users').select('*').limit(5);
-    document.getElementById("out").innerText = JSON.stringify({data, error}, null, 2);
+const supabaseUrl = "https://umzlriwvexvaabliriva.supabase.co";
+const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtemxyaXd2ZXh2YWFibGlyaXZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ4NjEwMjQsImV4cCI6MjA4MDQzNzAyNH0.8miF7Z0e2sTduJhveCk-6GKzroS0CYF-PS6BZeEKpEI";
+const supabase = Supabase.createClient(supabaseUrl, supabaseKey);
+
+const user_id = localStorage.getItem('user_id');
+if(!user_id){ window.location.href='login.html'; }
+
+async function loadSettings(){
+    const { data, error } = await supabase.from('user_settings').select('*').eq('user_id', user_id).single();
+    if(data){
+        document.getElementById('darkMode').checked = data.modo_escuro;
+        document.getElementById('notifications').checked = data.notificacoes;
+        document.getElementById('privacy').value = data.privacidade_perfil;
+    }
 }
+
+async function saveSettings(){
+    const modo_escuro = document.getElementById('darkMode').checked;
+    const notificacoes = document.getElementById('notifications').checked;
+    const privacidade_perfil = document.getElementById('privacy').value;
+
+    const { data, error } = await supabase.from('user_settings').upsert({
+        user_id, modo_escuro, notificacoes, privacidade_perfil, atualizado_em: new Date()
+    }, { onConflict:['user_id'] });
+
+    if(error) document.getElementById('msg').innerText = 'Erro: '+error.message;
+    else document.getElementById('msg').innerText = 'Configurações salvas!';
+}
+
+loadSettings();
 </script>
 
 </body>
