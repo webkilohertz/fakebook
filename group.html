@@ -1,53 +1,105 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>group</title>
+<title>FakeBook - Grupo</title>
 <style>
-body {
-    font-family: Arial;
-    padding: 20px;
-    background: #e9ebee;
-}
-nav {
-    background: white;
-    padding: 10px;
-    border-radius: 10px;
-    margin-bottom: 20px;
-}
-.box {
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-}
-button {
-    padding: 10px;
-    border: none;
-    background: #1877f2;
-    color: white;
-    border-radius: 6px;
-}
+body { margin:0; font-family: Arial, sans-serif; background:#f0f2f5; }
+header { background:#1877f2; color:white; padding:10px 20px; font-size:24px; }
+.container { max-width:800px; margin:20px auto; display:flex; gap:20px; }
+.group-info { flex:1; background:white; padding:15px; border-radius:10px; max-height:500px; overflow-y:auto; }
+.group-posts { flex:2; background:white; padding:15px; border-radius:10px; max-height:500px; display:flex; flex-direction:column; }
+.post { background:#f0f0f0; padding:10px; border-radius:6px; margin-bottom:10px; }
+input, textarea { width:100%; padding:5px; margin-top:5px; border-radius:5px; border:1px solid #ccc; }
+button { padding:5px 10px; margin-top:5px; border:none; border-radius:5px; background:#1877f2; color:white; cursor:pointer; }
 </style>
 </head>
 <body>
 
-<nav><a href="index.html">index</a> | <a href="login.html">login</a> | <a href="signup.html">signup</a> | <a href="profile.html">profile</a> | <a href="settings.html">settings</a> | <a href="post.html">post</a> | <a href="friends.html">friends</a> | <a href="followers.html">followers</a> | <a href="messages.html">messages</a> | <a href="groups.html">groups</a> | <a href="group.html">group</a> | <a href="pages.html">pages</a> | <a href="page.html">page</a> | <a href="stories.html">stories</a> | <a href="media.html">media</a> | <a href="notifications.html">notifications</a> | <a href="feed.html">feed</a> | </nav>
+<header>FakeBook - Grupo</header>
 
-<div class="box">
-<h2>group.html</h2>
+<div class="container">
+<div class="group-info">
+<h3 id="group-name">Grupo</h3>
+<p id="group-desc"></p>
+<p>Privacidade: <span id="group-privacy"></span></p>
+<h4>Membros</h4>
+<ul id="group-members"></ul>
+</div>
 
-<button onclick="testSupabase()">TESTAR SUPABASE</button>
-<pre id="out"></pre>
-
+<div class="group-posts">
+<h3>Posts do Grupo</h3>
+<div id="posts"></div>
+<textarea id="post-content" placeholder="Escreva algo no grupo..."></textarea>
+<input type="text" id="post-media" placeholder="URL de mídia (opcional)">
+<button onclick="createPost()">Postar</button>
+</div>
 </div>
 
 <script src="https://unpkg.com/@supabase/supabase-js/umd/supabase.js"></script>
 <script>
-const supabase = Supabase.createClient("https://umzlriwvexvaabliriva.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtemxyaXd2ZXh2YWFibGlyaXZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ4NjEwMjQsImV4cCI6MjA4MDQzNzAyNH0.8miF7Z0e2sTduJhveCk-6GKzroS0CYF-PS6BZeEKpEI");
-async function testSupabase() {
-    const { data, error } = await supabase.from('users').select('*').limit(5);
-    document.getElementById("out").innerText = JSON.stringify({data, error}, null, 2);
+const supabaseUrl = "https://umzlriwvexvaabliriva.supabase.co";
+const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtemxyaXd2ZXh2YWFibGlyaXZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ4NjEwMjQsImV4cCI6MjA4MDQzNzAyNH0.8miF7Z0e2sTduJhveCk-6GKzroS0CYF-PS6BZeEKpEI";
+const supabase = Supabase.createClient(supabaseUrl, supabaseKey);
+
+const user_id = localStorage.getItem('user_id');
+if(!user_id){ window.location.href='login.html'; }
+
+const urlParams = new URLSearchParams(window.location.search);
+const group_id = urlParams.get('id');
+if(!group_id){ alert('Grupo não especificado'); window.location.href='groups.html'; }
+
+// carregar informações do grupo
+async function loadGroup(){
+    const { data, error } = await supabase.from('groups').select('*').eq('id', group_id).single();
+    if(error || !data) return alert('Grupo não encontrado');
+    document.getElementById('group-name').innerText = data.nome;
+    document.getElementById('group-desc').innerText = data.descricao;
+    document.getElementById('group-privacy').innerText = data.privacidade;
 }
+
+// carregar membros
+async function loadMembers(){
+    const { data, error } = await supabase.from('group_members').select('*, users(nome,username)').eq('group_id', group_id);
+    const ul = document.getElementById('group-members');
+    ul.innerHTML='';
+    data.forEach(m=>{
+        const li = document.createElement('li');
+        li.innerText = m.users.nome + ' (@' + m.users.username + ')';
+        ul.appendChild(li);
+    });
+}
+
+// carregar posts
+async function loadPosts(){
+    const { data, error } = await supabase.from('group_posts').select('*, users(nome,username)').eq('group_id', group_id).order('criado_em',{ascending:false});
+    const container = document.getElementById('posts');
+    container.innerHTML='';
+    data.forEach(p=>{
+        const div = document.createElement('div');
+        div.className='post';
+        div.innerHTML = `<p><b>${p.users.nome} (@${p.users.username})</b></p>
+        <p>${p.conteudo}</p>
+        ${p.midia_url?`<img src="${p.midia_url}" width="100%">`:''}`;
+        container.appendChild(div);
+    });
+}
+
+// criar post
+async function createPost(){
+    const conteudo = document.getElementById('post-content').value.trim();
+    const midia_url = document.getElementById('post-media').value.trim();
+    if(!conteudo && !midia_url) return alert('Digite algo ou insira mídia');
+    await supabase.from('group_posts').insert([{group_id, user_id, conteudo, midia_url}]);
+    document.getElementById('post-content').value='';
+    document.getElementById('post-media').value='';
+    loadPosts();
+}
+
+// inicializar
+loadGroup();
+loadMembers();
+loadPosts();
 </script>
 
 </body>
