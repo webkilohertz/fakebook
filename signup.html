@@ -1,52 +1,52 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>signup</title>
+<title>FakeBook - Cadastro</title>
 <style>
-body {
-    font-family: Arial;
-    padding: 20px;
-    background: #e9ebee;
-}
-nav {
-    background: white;
-    padding: 10px;
-    border-radius: 10px;
-    margin-bottom: 20px;
-}
-.box {
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-}
-button {
-    padding: 10px;
-    border: none;
-    background: #1877f2;
-    color: white;
-    border-radius: 6px;
-}
+body { margin:0; font-family: Arial, sans-serif; background:#f0f2f5; display:flex; justify-content:center; align-items:center; height:100vh; }
+.signup-box { background:white; padding:30px; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,0.2); width:300px; }
+input { width:100%; padding:10px; margin:10px 0; border-radius:6px; border:1px solid #ccc; }
+button { width:100%; padding:10px; border:none; background:#1877f2; color:white; border-radius:6px; cursor:pointer; margin-top:10px; }
+p { font-size:14px; text-align:center; }
+p a { color:#1877f2; text-decoration:none; }
 </style>
 </head>
 <body>
 
-<nav><a href="index.html">index</a> | <a href="login.html">login</a> | <a href="signup.html">signup</a> | <a href="profile.html">profile</a> | <a href="settings.html">settings</a> | <a href="post.html">post</a> | <a href="friends.html">friends</a> | <a href="followers.html">followers</a> | <a href="messages.html">messages</a> | <a href="groups.html">groups</a> | <a href="group.html">group</a> | <a href="pages.html">pages</a> | <a href="page.html">page</a> | <a href="stories.html">stories</a> | <a href="media.html">media</a> | <a href="notifications.html">notifications</a> | <a href="feed.html">feed</a> | </nav>
-
-<div class="box">
-<h2>signup.html</h2>
-
-<button onclick="testSupabase()">TESTAR SUPABASE</button>
-<pre id="out"></pre>
-
+<div class="signup-box">
+<h2>Cadastro</h2>
+<input type="text" id="nome" placeholder="Nome">
+<input type="text" id="sobrenome" placeholder="Sobrenome">
+<input type="text" id="username" placeholder="Usuário">
+<input type="email" id="email" placeholder="Email">
+<input type="password" id="senha" placeholder="Senha">
+<button onclick="signup()">Cadastrar</button>
+<p>Já tem conta? <a href="login.html">Login</a></p>
+<pre id="msg"></pre>
 </div>
 
 <script src="https://unpkg.com/@supabase/supabase-js/umd/supabase.js"></script>
 <script>
-const supabase = Supabase.createClient("https://umzlriwvexvaabliriva.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtemxyaXd2ZXh2YWFibGlyaXZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ4NjEwMjQsImV4cCI6MjA4MDQzNzAyNH0.8miF7Z0e2sTduJhveCk-6GKzroS0CYF-PS6BZeEKpEI");
-async function testSupabase() {
-    const { data, error } = await supabase.from('users').select('*').limit(5);
-    document.getElementById("out").innerText = JSON.stringify({data, error}, null, 2);
+const supabaseUrl = "https://umzlriwvexvaabliriva.supabase.co";
+const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtemxyaXd2ZXh2YWFibGlyaXZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ4NjEwMjQsImV4cCI6MjA4MDQzNzAyNH0.8miF7Z0e2sTduJhveCk-6GKzroS0CYF-PS6BZeEKpEI";
+const supabase = Supabase.createClient(supabaseUrl, supabaseKey);
+
+async function signup(){
+    const nome = document.getElementById('nome').value.trim();
+    const sobrenome = document.getElementById('sobrenome').value.trim();
+    const username = document.getElementById('username').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const senha = document.getElementById('senha').value.trim();
+    if(!nome || !sobrenome || !username || !email || !senha){ document.getElementById('msg').innerText='Preencha todos os campos'; return; }
+
+    const { data: exists } = await supabase.from('users').select('id').or(`username.eq.${username},email.eq.${email}`).limit(1);
+    if(exists.length>0){ document.getElementById('msg').innerText='Usuário ou email já existe'; return; }
+
+    const { data, error } = await supabase.from('users').insert([{nome,sobrenome,username,email,senha_hash:senha}]);
+    if(error){ document.getElementById('msg').innerText='Erro: '+error.message; return; }
+    alert('Cadastro realizado! Faça login.');
+    window.location.href='login.html';
 }
 </script>
 
