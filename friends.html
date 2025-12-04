@@ -1,53 +1,101 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>friends</title>
+<title>FakeBook - Amigos</title>
 <style>
-body {
-    font-family: Arial;
-    padding: 20px;
-    background: #e9ebee;
-}
-nav {
-    background: white;
-    padding: 10px;
-    border-radius: 10px;
-    margin-bottom: 20px;
-}
-.box {
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-}
-button {
-    padding: 10px;
-    border: none;
-    background: #1877f2;
-    color: white;
-    border-radius: 6px;
-}
+body { margin:0; font-family: Arial, sans-serif; background:#f0f2f5; }
+header { background:#1877f2; color:white; padding:10px 20px; font-size:24px; }
+.container { max-width:600px; margin:20px auto; background:white; padding:20px; border-radius:10px; }
+.friend { display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid #ccc; }
+button { padding:5px 10px; border:none; border-radius:5px; cursor:pointer; }
+input { width:70%; padding:5px; margin-right:5px; border-radius:5px; border:1px solid #ccc; }
 </style>
 </head>
 <body>
 
-<nav><a href="index.html">index</a> | <a href="login.html">login</a> | <a href="signup.html">signup</a> | <a href="profile.html">profile</a> | <a href="settings.html">settings</a> | <a href="post.html">post</a> | <a href="friends.html">friends</a> | <a href="followers.html">followers</a> | <a href="messages.html">messages</a> | <a href="groups.html">groups</a> | <a href="group.html">group</a> | <a href="pages.html">pages</a> | <a href="page.html">page</a> | <a href="stories.html">stories</a> | <a href="media.html">media</a> | <a href="notifications.html">notifications</a> | <a href="feed.html">feed</a> | </nav>
+<header>FakeBook - Amigos</header>
 
-<div class="box">
-<h2>friends.html</h2>
+<div class="container">
+<h2>Adicionar Amigo</h2>
+<input type="text" id="friendUsername" placeholder="Nome de usuário">
+<button onclick="addFriend()">Adicionar</button>
 
-<button onclick="testSupabase()">TESTAR SUPABASE</button>
-<pre id="out"></pre>
+<h2>Solicitações Pendentes</h2>
+<div id="pending-friends"></div>
 
+<h2>Seus Amigos</h2>
+<div id="friends-list"></div>
 </div>
 
 <script src="https://unpkg.com/@supabase/supabase-js/umd/supabase.js"></script>
 <script>
-const supabase = Supabase.createClient("https://umzlriwvexvaabliriva.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtemxyaXd2ZXh2YWFibGlyaXZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ4NjEwMjQsImV4cCI6MjA4MDQzNzAyNH0.8miF7Z0e2sTduJhveCk-6GKzroS0CYF-PS6BZeEKpEI");
-async function testSupabase() {
-    const { data, error } = await supabase.from('users').select('*').limit(5);
-    document.getElementById("out").innerText = JSON.stringify({data, error}, null, 2);
+const supabaseUrl = "https://umzlriwvexvaabliriva.supabase.co";
+const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtemxyaXd2ZXh2YWFibGlyaXZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ4NjEwMjQsImV4cCI6MjA4MDQzNzAyNH0.8miF7Z0e2sTduJhveCk-6GKzroS0CYF-PS6BZeEKpEI";
+const supabase = Supabase.createClient(supabaseUrl, supabaseKey);
+
+const user_id = localStorage.getItem('user_id');
+if(!user_id){ window.location.href='login.html'; }
+
+// Adicionar amigo
+async function addFriend(){
+    const username = document.getElementById('friendUsername').value.trim();
+    if(!username) return alert('Digite o nome de usuário');
+    const { data, error } = await supabase.from('users').select('id').eq('username', username).single();
+    if(error || !data) return alert('Usuário não encontrado');
+    const { error: e } = await supabase.from('friends').insert([{user_id, friend_id: data.id, status:'pendente'}]);
+    if(e) alert('Erro ao enviar solicitação'); else { alert('Solicitação enviada!'); loadFriends(); }
 }
+
+// Carregar amigos e pendentes
+async function loadFriends(){
+    // Pendentes recebidos
+    const { data: pendings } = await supabase.from('friends').select('id,user_id,friend_id,status,users(nome,username)').eq('friend_id', user_id).eq('status','pendente').order('criado_em',{ascending:false}).limit(20).single();
+    const pendingDiv = document.getElementById('pending-friends');
+    pendingDiv.innerHTML='';
+    const { data: pendingsData } = await supabase.from('friends').select('id,user_id,friend_id,status,users(nome,username)').eq('friend_id', user_id).eq('status','pendente');
+    pendingsData.forEach(p=>{
+        const div = document.createElement('div');
+        div.className='friend';
+        div.innerHTML = `<span>${p.users.nome} (@${p.users.username})</span>
+        <button onclick="acceptFriend(${p.id})">Aceitar</button>
+        <button onclick="rejectFriend(${p.id})">Recusar</button>`;
+        pendingDiv.appendChild(div);
+    });
+
+    // Amigos aceitos
+    const { data: friends } = await supabase.from('friends').select('id,user_id,friend_id,status,users(nome,username)').or(`user_id.eq.${user_id},friend_id.eq.${user_id}`).eq('status','aceito');
+    const friendsDiv = document.getElementById('friends-list');
+    friendsDiv.innerHTML='';
+    friends.forEach(f=>{
+        const friendName = f.user_id==user_id?f.users.nome+' (@'+f.users.username+')':f.users.nome+' (@'+f.users.username+')';
+        const div = document.createElement('div');
+        div.className='friend';
+        div.innerHTML = `<span>${friendName}</span>
+        <button onclick="removeFriend(${f.id})">Remover</button>`;
+        friendsDiv.appendChild(div);
+    });
+}
+
+// Aceitar amigo
+async function acceptFriend(id){
+    await supabase.from('friends').update({status:'aceito'}).eq('id',id);
+    loadFriends();
+}
+
+// Recusar amigo
+async function rejectFriend(id){
+    await supabase.from('friends').delete().eq('id',id);
+    loadFriends();
+}
+
+// Remover amigo
+async function removeFriend(id){
+    await supabase.from('friends').delete().eq('id',id);
+    loadFriends();
+}
+
+loadFriends();
 </script>
 
 </body>
