@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>FakeBook - Cadastro Completo</title>
+<style>
+body { 
+    margin:0; 
+    font-family: Arial, sans-serif; 
+    background:#f0f2f5; 
+    display:flex; 
+    justify-content:center; 
+    align-items:center; 
+    height:100vh; 
+    flex-direction: column; 
+    position: relative;
+}
+
+/* LINKS LATERAIS - PRIMEIRA COLUNA */
+.right-links-1 {
+    position: fixed;
+    top: 60px;
+    right: 20px;
+    background: white;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    width: 140px;
+}
+
+/* LINKS LATERAIS - SEGUNDA COLUNA */
+.right-links-2 {
+    position: fixed;
+    top: 180px;
+    right: 20px;
+    background: white;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    width: 140px;
+}
+
+.right-links-1 a,
+.right-links-2 a {
+    display: block;
+    margin: 5px 0;
+    color: #1877f2;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.right-links-1 a:hover,
+.right-links-2 a:hover {
+    text-decoration: underline;
+}
+
+.signup-box { 
+    background:white; 
+    padding:30px; 
+    border-radius:10px; 
+    box-shadow:0 2px 10px rgba(0,0,0,0.2); 
+    width:320px; 
+    margin-top: 20px; 
+    z-index: 100;
+}
+
+input, select { 
+    width:100%; 
+    padding:10px; 
+    margin:8px 0; 
+    border-radius:6px; 
+    border:1px solid #ccc; 
+}
+
+button { 
+    width:100%; 
+    padding:10px; 
+    border:none; 
+    background:#1877f2; 
+    color:white; 
+    border-radius:6px; 
+    cursor:pointer; 
+    margin-top:10px; 
+}
+
+p { 
+    font-size:14px; 
+    text-align:center; 
+}
+
+p a { 
+    color:#1877f2; 
+    text-decoration:none; 
+}
+
+pre { 
+    font-size:12px; 
+    color:red; 
+}
+
+nav { 
+    background:#fff; 
+    padding:10px; 
+    text-align:center; 
+    box-shadow:0 2px 4px rgba(0,0,0,0.1); 
+    width:100%; 
+    position: fixed; 
+    top: 0; 
+    left: 0; 
+    z-index: 1000;
+}
+
+nav a { 
+    margin:0 10px; 
+    color:#1877f2;
+    text-decoration:none;
+}
+
+nav a:hover {
+    text-decoration: underline;
+}
+</style>
+</head>
+  
+<body>
+<!-- Menu de navegação fixo no topo -->
+<nav>
+  <a href="feed.html">Feed</a>
+  <a href="profile.html">Perfil</a>
+  <a href="friends.html">Amigos</a>
+  <a href="groups.html">Grupos</a>
+  <a href="pages.html">Páginas</a>
+  <a href="media.html">Mídia</a>
+  <a href="stories.html">Stories</a>
+  <a href="settings.html">Configurações</a>
+  <a href="login.html">Logout</a>
+</nav>
+
+<!-- PRIMEIRA COLUNA DE LINKS À DIREITA -->
+<div class="right-links-1">
+    <a href="feedzap.html">Compartilhar</a>
+    <a href="profile.html">Perfil</a>
+    <a href="friends.html">Amigos</a>
+    <a href="login.html">Login</a>
+</div>
+
+<!-- SEGUNDA COLUNA DE LINKS À DIREITA -->
+<div class="right-links-2">
+    <a href="feeds.html">Comentários</a>
+    <a href="feed1.html">News</a>
+    <a href="feedzap.html">FeedZap</a>
+    <a href="feed3.html">FakeBook Lar</a>
+    <a href="index.html">Raiz FakeBook</a>
+    <a href="loginblock.html">Logon</a>
+    <a href="messages.html">Messages</a>
+    <a href="notifications.html">Notificações</a>
+    <a href="signup.html">Signup Cadastro</a>
+    <a href="groups.html">GroupS</a>
+</div>
+
+<!-- Caixa de cadastro -->
+<div class="signup-box">
+<h2>Cadastro Completo</h2>
+<input type="text" id="nome" placeholder="Nome">
+<input type="text" id="sobrenome" placeholder="Sobrenome">
+<input type="text" id="username" placeholder="Usuário *">
+<input type="email" id="email" placeholder="Email *">
+<input type="text" id="telefone" placeholder="Telefone">
+<input type="password" id="senha" placeholder="Senha *">
+<input type="text" id="bio" placeholder="Bio">
+<input type="text" id="avatar_url" placeholder="URL Avatar">
+<input type="text" id="capa_url" placeholder="URL Capa">
+<select id="genero">
+    <option value="">Gênero</option>
+    <option value="Masculino">Masculino</option>
+    <option value="Feminino">Feminino</option>
+    <option value="Outro">Outro</option>
+</select>
+<input type="date" id="aniversario" placeholder="Aniversário">
+<input type="text" id="cidade" placeholder="Cidade">
+<input type="text" id="cidade_origem" placeholder="Cidade de Origem">
+<select id="relacionamento">
+    <option value="">Relacionamento</option>
+    <option value="Solteiro(a)">Solteiro(a)</option>
+    <option value="Namorando">Namorando</option>
+    <option value="Casado(a)">Casado(a)</option>
+    <option value="Complicado">Complicado</option>
+</select>
+<button onclick="signup()">Cadastrar</button>
+<p>Já tem conta? <a href="login.html">Login</a></p>
+<pre id="msg"></pre>
+</div>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+// URLs do seu projeto Supabase
+const SUPABASE_URL = "https://umzlriwvexvaabliriva.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtemxyaXd2ZXh2YWFibGlyaXZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ4NjEwMjQsImV4cCI6MjA4MDQzNzAyNH0.8miF7Z0e2sTduJhveCk-6GKzroS0CYF-PS6BZeEKpEI";
+
+// Inicializar Supabase CORRETAMENTE
+let supabase;
+
+async function initSupabase() {
+    try {
+        // Verificar se o objeto Supabase está disponível
+        if (window.supabase) {
+            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            console.log('Supabase inicializado com sucesso');
+            return true;
+        } else {
+            // Tentar importar dinamicamente
+            const { createClient } = window.supabase;
+            supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            console.log('Supabase inicializado via createClient');
+            return true;
+        }
+    } catch (error) {
+        console.error('Erro ao inicializar Supabase:', error);
+        document.getElementById('msg').innerText = 'Erro ao conectar com o servidor';
+        return false;
+    }
+}
+
+async function signup(){
+    try {
+        // Verificar se Supabase está inicializado
+        if (!supabase) {
+            const initialized = await initSupabase();
+            if (!initialized) {
+                document.getElementById('msg').innerText = 'Erro: Servidor não disponível';
+                return;
+            }
+        }
+
+        const nome = document.getElementById('nome').value.trim();
+        const sobrenome = document.getElementById('sobrenome').value.trim();
+        const username = document.getElementById('username').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const telefone = document.getElementById('telefone').value.trim();
+        const senha = document.getElementById('senha').value.trim();
+        const bio = document.getElementById('bio').value.trim();
+        const avatar_url = document.getElementById('avatar_url').value.trim();
+        const capa_url = document.getElementById('capa_url').value.trim();
+        const genero = document.getElementById('genero').value;
+        const aniversario = document.getElementById('aniversario').value || null;
+        const cidade = document.getElementById('cidade').value.trim();
+        const cidade_origem = document.getElementById('cidade_origem').value.trim();
+        const relacionamento = document.getElementById('relacionamento').value;
+
+        if(!username || !email || !senha){
+            document.getElementById('msg').innerText='Preencha os campos obrigatórios (*)';
+            return;
+        }
+
+        // Verifica duplicados - Correção na query
+        const { data: exists, error: existsError } = await supabase
+            .from('users')
+            .select('id')
+            .or(`username.eq.${username},email.eq.${email}`)
+            .limit(1);
+
+        if(existsError){ 
+            console.error('Erro verificação:', existsError); 
+            document.getElementById('msg').innerText='Erro ao verificar duplicados: ' + existsError.message; 
+            return; 
+        }
+        
+        if(exists && exists.length > 0){ 
+            document.getElementById('msg').innerText='Usuário ou email já existe'; 
+            return; 
+        }
+
+        // Inserção completa
+        const { data, error } = await supabase
+            .from('users')
+            .insert([{
+                nome,
+                sobrenome,
+                username,
+                email,
+                telefone,
+                senha_hash: senha,
+                bio,
+                avatar_url,
+                capa_url,
+                genero,
+                aniversario,
+                cidade,
+                cidade_origem,
+                relacionamento,
+                email_verificado: false,
+                telefone_verificado: false
+            }])
+            .select();
+
+        if(error){ 
+            console.error('Erro inserção:', error); 
+            document.getElementById('msg').innerText='Erro ao cadastrar: '+error.message; 
+            return; 
+        }
+
+        console.log('Cadastro realizado:', data);
+        alert('Cadastro realizado com sucesso!');
+        window.location.href='login.html';
+        
+    } catch(err){
+        console.error('Erro inesperado:', err);
+        document.getElementById('msg').innerText='Erro inesperado: '+err.message;
+    }
+}
+
+// Inicializar Supabase quando a página carregar
+window.addEventListener('DOMContentLoaded', async () => {
+    await initSupabase();
+    
+    // Testar a conexão
+    if (supabase) {
+        try {
+            const { data, error } = await supabase.from('users').select('count', { count: 'exact', head: true });
+            if (error) {
+                console.error('Erro ao testar conexão:', error);
+                document.getElementById('msg').innerText = 'Erro na conexão com o banco de dados';
+            } else {
+                console.log('Conexão com Supabase testada com sucesso');
+            }
+        } catch (testError) {
+            console.error('Erro no teste de conexão:', testError);
+        }
+    }
+});
+</script>
+
+</body>
+</html>
