@@ -2,98 +2,405 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
- <meta http-equiv="CONTENT-TYPE" content="text/html; charset=UTF-8">
-  
-<title>FakeBook - Feed</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FakeBook - Página Inicial</title>
 <style>
-body { margin:0; font-family: Arial, sans-serif; background:#f0f2f5; }
-header { background:#1877f2; color:white; padding:10px 20px; font-size:24px; }
-nav { display:flex; background:white; padding:10px; gap:10px; border-bottom:1px solid #ccc; }
-nav button { background:#1877f2; color:white; border:none; padding:8px 12px; border-radius:6px; cursor:pointer; }
-.container { display:flex; padding:20px; gap:20px; }
-.feed { flex:3; }
-.sidebar { flex:1; background:white; padding:15px; border-radius:10px; height:fit-content; }
-.post { background:white; padding:15px; border-radius:10px; margin-bottom:15px; }
-button.like, button.comment { margin-right:5px; padding:5px 8px; border:none; border-radius:5px; cursor:pointer; }
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body { 
+    font-family: Arial, sans-serif; 
+    background: #f0f2f5; 
+}
+
+header { 
+    background: #1877f2; 
+    color: white; 
+    padding: 20px 40px; 
+    font-size: 32px;
+    font-weight: bold;
+    text-align: center;
+}
+
+nav {
+    background: white; 
+    padding: 15px 40px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+nav a {
+    margin: 0 20px;
+    color: #1877f2;
+    text-decoration: none;
+    font-size: 20px;
+    font-weight: 500;
+    padding: 10px 15px;
+    border-radius: 8px;
+    transition: background 0.3s;
+}
+
+nav a:hover {
+    background: #f0f2f5;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 0 20px;
+    display: flex;
+    gap: 40px;
+}
+
+.main-content {
+    flex: 2;
+}
+
+.welcome-card {
+    background: white;
+    padding: 40px;
+    border-radius: 12px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+
+.welcome-card h2 {
+    font-size: 36px;
+    color: #1877f2;
+    margin-bottom: 20px;
+}
+
+.welcome-card p {
+    font-size: 22px;
+    color: #333;
+    line-height: 1.6;
+    margin-bottom: 20px;
+}
+
+.login-box {
+    background: white;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+
+.login-box h3 {
+    font-size: 28px;
+    color: #1877f2;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.login-input {
+    width: 100%;
+    padding: 18px;
+    margin: 15px 0;
+    border-radius: 8px;
+    border: 2px solid #ddd;
+    font-size: 18px;
+}
+
+.login-input:focus {
+    border-color: #1877f2;
+    outline: none;
+}
+
+.login-btn {
+    width: 100%;
+    padding: 18px;
+    border: none;
+    background: #1877f2;
+    color: white;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 20px;
+    font-size: 20px;
+    font-weight: bold;
+    transition: background 0.3s;
+}
+
+.login-btn:hover {
+    background: #166fe5;
+}
+
+.register-link {
+    text-align: center;
+    margin-top: 25px;
+    font-size: 18px;
+}
+
+.register-link a {
+    color: #1877f2;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.register-link a:hover {
+    text-decoration: underline;
+}
+
+.error-msg {
+    color: #f02849;
+    font-size: 18px;
+    text-align: center;
+    margin-top: 15px;
+    padding: 15px;
+    background: #ffe6e6;
+    border-radius: 8px;
+    border-left: 4px solid #f02849;
+}
+
+.features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    margin-top: 40px;
+}
+
+.feature-card {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+
+.feature-card h4 {
+    font-size: 24px;
+    color: #1877f2;
+    margin-bottom: 15px;
+}
+
+.feature-card p {
+    font-size: 18px;
+    color: #333;
+    line-height: 1.6;
+}
+
+.footer {
+    text-align: center;
+    padding: 30px;
+    margin-top: 50px;
+    color: #666;
+    font-size: 18px;
+    border-top: 1px solid #ddd;
+}
+
+.status-badge {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #42b72a;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 16px;
+    z-index: 1000;
+}
+
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column;
+    }
+    
+    nav a {
+        display: block;
+        margin: 10px 0;
+    }
+    
+    .welcome-card,
+    .login-box,
+    .feature-card {
+        padding: 25px;
+    }
+}
 </style>
 </head>
 <body>
 
-<header>FakeBook</header>
-<nav style="background:#fff;padding:10px;text-align:center;box-shadow:0 2px 4px rgba(0,0,0,0.1);">
-  <a href="feed.html" style="margin:0 10px;">Feed</a>
-  <a href="profile.html" style="margin:0 10px;">Perfil</a>
-  <a href="friends.html" style="margin:0 10px;">Amigos</a>
-  <a href="groups.html" style="margin:0 10px;">Grupos</a>
-  <a href="pages.html" style="margin:0 10px;">Páginas</a>
-  <a href="media.html" style="margin:0 10px;">Mídia</a>
-  <a href="stories.html" style="margin:0 10px;">Stories</a>
-  <a href="settings.html" style="margin:0 10px;">Configurações</a>
-  <a href="login.html" style="margin:0 10px;">Logout</a>
-</nav>
-    
+<div id="status-badge" class="status-badge" style="display:none;"></div>
+
+<header>
+    FakeBook
+    <nav>
+        <a href="feed.html">📰 Feed</a>
+        <a href="profile.html">👤 Perfil</a>
+        <a href="friends.html">👥 Amigos</a>
+        <a href="groups.html">👥 Grupos</a>
+        <a href="pages.html">📄 Páginas</a>
+        <a href="media.html">🎬 Mídia</a>
+        <a href="stories.html">📸 Stories</a>
+        <a href="settings.html">⚙️ Configurações</a>
+        <a href="login.html">🚪 Logout</a>
+    </nav>
+</header>
+
 <div class="container">
-    <div class="feed">
-        <h2>Feed</h2>
-        <div id="posts"></div>
+    <div class="main-content">
+        <div class="welcome-card">
+            <h2>Bem-vindo ao FakeBook</h2>
+            <p>Conecte-se com seus amigos, compartilhe momentos e descubra novas experiências.</p>
+            <p>Faça login para acessar todas as funcionalidades da sua rede social favorita.</p>
+            
+            <div class="features">
+                <div class="feature-card">
+                    <h4>📰 Feed Personalizado</h4>
+                    <p>Veja o que seus amigos estão compartilhando em tempo real.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <h4>👥 Conexões</h4>
+                    <p>Encontre e conecte-se com pessoas que compartilham seus interesses.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <h4>📸 Compartilhamento</h4>
+                    <p>Compartilhe fotos, vídeos e momentos especiais com sua rede.</p>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="sidebar">
-        <h3>Menu</h3>
-        <button onclick="goTo('profile')">Meu Perfil</button>
-        <button onclick="goTo('friends')">Amigos</button>
-        <button onclick="goTo('messages')">Mensagens</button>
-        <button onclick="goTo('stories')">Stories</button>
-        <button onclick="goTo('notifications')">Notificações</button>
+    
+    <div class="login-box">
+        <h3>Entrar no FakeBook</h3>
+        
+        <input type="text" id="username" class="login-input" placeholder="Usuário ou email">
+        <input type="password" id="password" class="login-input" placeholder="Senha">
+        
+        <button onclick="login()" class="login-btn">Entrar</button>
+        
+        <div id="msg" class="error-msg"></div>
+        
+        <div class="register-link">
+            <p>Não tem uma conta? <a href="signup.html">Cadastre-se agora</a></p>
+        </div>
     </div>
 </div>
 
-<script src="https://unpkg.com/@supabase/supabase-js/umd/supabase.js"></script>
+<div class="footer">
+    <p>© 2024 FakeBook. Todos os direitos reservados.</p>
+    <p style="font-size: 16px; margin-top: 10px;">Uma rede social para conectar pessoas.</p>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
-const supabaseUrl = "https://umzlriwvexvaabliriva.supabase.co";
-const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtemxyaXd2ZXh2YWFibGlyaXZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ4NjEwMjQsImV4cCI6MjA4MDQzNzAyNH0.8miF7Z0e2sTduJhveCk-6GKzroS0CYF-PS6BZeEKpEI";
-const supabase = Supabase.createClient(supabaseUrl, supabaseKey);
+const SUPABASE_URL = "https://umzlriwvexvaabliriva.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtemxyaXd2ZXh2YWFibGlyaXZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ4NjEwMjQsImV4cCI6MjA4MDQzNzAyNH0.8miF7Z0e2sTduJhveCk-6GKzroS0CYF-PS6BZeEKpEI";
 
-// Função de navegação interna (simples)
-function goTo(page){
-    window.location.href = page + ".html";
+let supabase;
+
+function initSupabase() {
+    try {
+        if (typeof window.supabase !== 'undefined') {
+            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            console.log('Supabase OK');
+            return true;
+        } else {
+            console.error('Supabase não carregou');
+            return false;
+        }
+    } catch (error) {
+        console.error('Erro:', error);
+        return false;
+    }
 }
 
-// Carrega posts do Supabase
-async function loadPosts(){
-    const { data, error } = await supabase.from('posts').select(`
-        id, conteudo, midia_url, user_id, criado_em,
-        users(nome, sobrenome)
-    `).order('criado_em', {ascending:false}).limit(10);
-    const container = document.getElementById('posts');
-    container.innerHTML = '';
-    if(error){ container.innerHTML = 'Erro ao carregar posts'; return; }
-    data.forEach(p => {
-        const div = document.createElement('div');
-        div.className = 'post';
-        div.innerHTML = `<strong>${p.users.nome} ${p.users.sobrenome}</strong><p>${p.conteudo || ''}</p>${p.midia_url? '<img src="'+p.midia_url+'" width="100%">':''}
-        <div>
-        <button class="like" onclick="likePost(${p.id})">Curtir</button>
-        <button class="comment" onclick="commentPost(${p.id})">Comentar</button>
-        </div>`;
-        container.appendChild(div);
-    });
+function checkLoginStatus() {
+    const user_id = localStorage.getItem('user_id');
+    const user_name = localStorage.getItem('user_name');
+    
+    if (user_id && user_name) {
+        const badge = document.getElementById('status-badge');
+        badge.textContent = `👤 Logado como: ${user_name}`;
+        badge.style.display = 'block';
+        badge.style.background = '#42b72a';
+        
+        // Mostra opção de ir para feed
+        document.querySelector('.login-box h3').textContent = 'Bem-vindo de volta!';
+        document.querySelector('.login-btn').textContent = 'Ir para o Feed';
+        document.querySelector('.login-btn').onclick = function() {
+            window.location.href = 'feed.html';
+        };
+        
+        // Adiciona botão de logout
+        const logoutBtn = document.createElement('button');
+        logoutBtn.className = 'login-btn';
+        logoutBtn.style.background = '#f02849';
+        logoutBtn.style.marginTop = '10px';
+        logoutBtn.textContent = 'Sair';
+        logoutBtn.onclick = function() {
+            localStorage.clear();
+            location.reload();
+        };
+        
+        document.querySelector('.login-box').appendChild(logoutBtn);
+    }
 }
 
-// Curtir post (simples)
-async function likePost(postId){
-    const { data, error } = await supabase.from('post_likes').insert([{post_id: postId, user_id:1}]);
-    if(error) alert('Erro ao curtir'); else loadPosts();
+async function login() {
+    try {
+        if (!supabase) {
+            if (!initSupabase()) {
+                document.getElementById('msg').innerText = 'Erro de conexão';
+                return;
+            }
+        }
+
+        const username = document.getElementById('username').value.trim();
+        const password = document.getElementById('password').value.trim();
+        
+        if(!username || !password){ 
+            document.getElementById('msg').innerText = 'Preencha todos os campos'; 
+            return; 
+        }
+        
+        console.log('Tentando login:', username);
+        
+        const { data, error } = await supabase
+            .from('users')
+            .select('*')
+            .or(`username.eq.${username},email.eq.${username}`)
+            .eq('senha_hash', password)
+            .limit(1);
+        
+        if(error){ 
+            console.error('Erro:', error);
+            document.getElementById('msg').innerText = 'Erro: ' + error.message; 
+            return; 
+        }
+        
+        if(!data || data.length===0){ 
+            document.getElementById('msg').innerText = 'Usuário ou senha incorretos'; 
+            return; 
+        }
+        
+        console.log('Login OK:', data[0].username);
+        
+        localStorage.setItem('user_id', data[0].id);
+        localStorage.setItem('user_name', data[0].username);
+        localStorage.setItem('user_email', data[0].email);
+        
+        window.location.href = 'feed.html';
+        
+    } catch(err) {
+        console.error('Erro:', err);
+        document.getElementById('msg').innerText = 'Erro: ' + err.message;
+    }
 }
 
-// Comentar (prompt simples)
-async function commentPost(postId){
-    const conteudo = prompt('Digite seu comentário:');
-    if(!conteudo) return;
-    const { data, error } = await supabase.from('comments').insert([{post_id: postId, user_id:1, conteudo}]);
-    if(error) alert('Erro ao comentar'); else loadPosts();
-}
+window.addEventListener('DOMContentLoaded', () => {
+    console.log('Página inicial carregada');
+    initSupabase();
+    checkLoginStatus();
+});
 
-loadPosts();
+document.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        login();
+    }
+});
 </script>
 
 </body>
