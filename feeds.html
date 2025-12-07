@@ -2,116 +2,603 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
- <meta http-equiv="CONTENT-TYPE" content="text/html; charset=UTF-8">
-    
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>FakeBook - Feed</title>
 <style>
-body { margin:0; font-family: Arial, sans-serif; background:#f0f2f5; }
-header { background:#1877f2; color:white; padding:10px 20px; font-size:24px; }
-.container { max-width:600px; margin:20px auto; }
-.post { background:white; padding:15px; border-radius:10px; margin-bottom:20px; }
-.post h4 { margin:0 0 10px 0; }
-.post img, .post video { max-width:100%; border-radius:6px; margin-top:10px; }
-button { padding:5px 10px; margin-top:5px; border:none; border-radius:5px; background:#1877f2; color:white; cursor:pointer; }
-textarea { width:100%; padding:5px; margin-top:10px; border-radius:5px; border:1px solid #ccc; }
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body { 
+    font-family: Arial, sans-serif; 
+    background: #f0f2f5; 
+    color: #333;
+    font-size: 18px;
+}
+
+header { 
+    background: #1877f2; 
+    color: white; 
+    padding: 20px; 
+    font-size: 28px;
+    text-align: center;
+}
+
+nav {
+    background: white; 
+    padding: 15px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+nav a {
+    margin: 0 15px;
+    color: #1877f2;
+    text-decoration: none;
+    font-size: 18px;
+    font-weight: 500;
+    padding: 8px 12px;
+    border-radius: 6px;
+    transition: background 0.3s;
+}
+
+nav a:hover {
+    background: #f0f2f5;
+}
+
+.container {
+    max-width: 700px;
+    margin: 30px auto;
+    padding: 0 20px;
+}
+
+.post-form {
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    margin-bottom: 25px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.post-form h3 {
+    font-size: 22px;
+    color: #1877f2;
+    margin-bottom: 15px;
+}
+
+.post-form textarea, .post-form input, .post-form select {
+    width: 100%;
+    padding: 15px;
+    margin: 10px 0;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    font-size: 18px;
+}
+
+.post-form button {
+    background: #1877f2;
+    color: white;
+    border: none;
+    padding: 15px 25px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: 500;
+    transition: background 0.3s;
+}
+
+.post-form button:hover {
+    background: #166fe5;
+}
+
+.post {
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    margin-bottom: 25px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.post-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.post-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: #1877f2;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    font-weight: bold;
+    margin-right: 15px;
+}
+
+.post-author {
+    flex: 1;
+}
+
+.post-author-name {
+    font-weight: bold;
+    font-size: 18px;
+    color: #1877f2;
+}
+
+.post-author-time {
+    color: #666;
+    font-size: 14px;
+}
+
+.post-content {
+    margin: 20px 0;
+    font-size: 18px;
+    line-height: 1.5;
+}
+
+.post-media {
+    max-width: 100%;
+    border-radius: 8px;
+    margin-top: 15px;
+}
+
+.post-actions {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+    display: flex;
+    gap: 15px;
+}
+
+.post-actions button {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+    transition: all 0.3s;
+}
+
+.btn-like {
+    background: #f0f2f5;
+    color: #1877f2;
+}
+
+.btn-like:hover {
+    background: #e7f3ff;
+}
+
+.btn-comment {
+    background: #f0f2f5;
+    color: #1877f2;
+}
+
+.btn-comment:hover {
+    background: #e7f3ff;
+}
+
+.comments-section {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+}
+
+.comments-section h4 {
+    font-size: 18px;
+    color: #333;
+    margin-bottom: 15px;
+}
+
+.comment-form {
+    margin-bottom: 20px;
+}
+
+.comment-form textarea {
+    width: 100%;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    font-size: 16px;
+    margin-bottom: 10px;
+    resize: vertical;
+}
+
+.comment-form button {
+    padding: 10px 20px;
+    background: #1877f2;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.comment-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.comment-item {
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.comment-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.comment-author {
+    font-weight: bold;
+    color: #1877f2;
+    font-size: 16px;
+}
+
+.comment-time {
+    color: #666;
+    font-size: 14px;
+}
+
+.comment-content {
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+.empty-comments {
+    text-align: center;
+    padding: 20px;
+    color: #666;
+    font-size: 16px;
+}
 </style>
 </head>
 <body>
 
-<header>FakeBook - Feed
-<nav style="background:#fff;padding:10px;text-align:center;box-shadow:0 2px 4px rgba(0,0,0,0.1);">
-  <a href="feed.html" style="margin:0 10px;">Feed</a>
-  <a href="profile.html" style="margin:0 10px;">Perfil</a>
-  <a href="friends.html" style="margin:0 10px;">Amigos</a>
-  <a href="groups.html" style="margin:0 10px;">Grupos</a>
-  <a href="pages.html" style="margin:0 10px;">Páginas</a>
-  <a href="media.html" style="margin:0 10px;">Mídia</a>
-  <a href="stories.html" style="margin:0 10px;">Stories</a>
-  <a href="settings.html" style="margin:0 10px;">Configurações</a>
-  <a href="login.html" style="margin:0 10px;">Logout</a>
+<header>FakeBook Feed</header>
+<nav>
+    <a href="index.html">Lar</a>
+    <a href="feed.html">Feed</a>
+    <a href="profile.html">Perfil</a>
+    <a href="friends.html">Amigos</a>
+    <a href="login.html">Logout</a>
 </nav>
 
- 
-</header>
-
 <div class="container">
-<h3>Novo Post</h3>
-<textarea id="post-content" placeholder="No que você está pensando?"></textarea>
-<input type="text" id="post-media" placeholder="URL de mídia (opcional)">
-<select id="post-type">
-<option value="texto">Texto</option>
-<option value="imagem">Imagem</option>
-<option value="video">Vídeo</option>
-</select>
-<select id="post-privacy">
-<option value="publico">Público</option>
-<option value="amigos">Amigos</option>
-<option value="privado">Privado</option>
-</select>
-<button onclick="createPost()">Postar</button>
+    <!-- FORMULÁRIO DE POST -->
+    <div class="post-form">
+        <h3>📝 Novo Post</h3>
+        <textarea id="post-content" placeholder="No que você está pensando?" rows="4"></textarea>
+        <input type="text" id="post-media" placeholder="URL de mídia (opcional)">
+        <select id="post-type">
+            <option value="texto">Texto</option>
+            <option value="imagem">Imagem</option>
+            <option value="video">Vídeo</option>
+        </select>
+        <select id="post-privacy">
+            <option value="publico">Público</option>
+            <option value="amigos">Amigos</option>
+            <option value="privado">Privado</option>
+        </select>
+        <button onclick="createPost()">Postar</button>
+    </div>
 
-<h3>Feed</h3>
-<div id="feed"></div>
+    <!-- FEED DE POSTS -->
+    <h3>📰 Feed</h3>
+    <div id="feed"></div>
 </div>
 
-<script src="https://unpkg.com/@supabase/supabase-js/umd/supabase.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
-const supabaseUrl = "https://umzlriwvexvaabliriva.supabase.co";
-const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtemxyaXd2ZXh2YWFibGlyaXZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ4NjEwMjQsImV4cCI6MjA4MDQzNzAyNH0.8miF7Z0e2sTduJhveCk-6GKzroS0CYF-PS6BZeEKpEI";
-const supabase = Supabase.createClient(supabaseUrl, supabaseKey);
+const SUPABASE_URL = "https://umzlriwvexvaabliriva.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtemxyaXd2ZXh2YWFibGlyaXZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ4NjEwMjQsImV4cCI6MjA4MDQzNzAyNH0.8miF7Z0e2sTduJhveCk-6GKzroS0CYF-PS6BZeEKpEI";
+
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 const user_id = localStorage.getItem('user_id');
-if(!user_id){ window.location.href='login.html'; }
+if(!user_id) { 
+    alert('Faça login primeiro!');
+    window.location.href = 'login.html'; 
+}
 
-// criar post
-async function createPost(){
+// VARIÁVEL PARA CONTROLAR COMENTÁRIOS ABERTOS
+let openCommentPostId = null;
+
+// CRIAR POST
+async function createPost() {
     const conteudo = document.getElementById('post-content').value.trim();
     const midia_url = document.getElementById('post-media').value.trim();
     const tipo = document.getElementById('post-type').value;
     const privacidade = document.getElementById('post-privacy').value;
-    if(!conteudo && !midia_url) return alert('Digite algo ou insira mídia');
-    await supabase.from('posts').insert([{user_id, conteudo, midia_url, tipo, privacidade}]);
-    document.getElementById('post-content').value='';
-    document.getElementById('post-media').value='';
-    loadFeed();
+    
+    if(!conteudo && !midia_url) {
+        alert('Digite algo ou insira uma mídia!');
+        return;
+    }
+    
+    try {
+        const { error } = await supabase
+            .from('posts')
+            .insert([{
+                user_id: user_id,
+                conteudo: conteudo,
+                midia_url: midia_url || null,
+                tipo: tipo,
+                privacidade: privacidade,
+                criado_em: new Date().toISOString()
+            }]);
+        
+        if (error) {
+            console.error('Erro ao criar post:', error);
+            alert('Erro ao criar post: ' + error.message);
+            return;
+        }
+        
+        alert('Post criado com sucesso!');
+        document.getElementById('post-content').value = '';
+        document.getElementById('post-media').value = '';
+        loadFeed();
+        
+    } catch (err) {
+        console.error('Erro inesperado:', err);
+        alert('Erro inesperado ao criar post');
+    }
 }
 
-// carregar feed
-async function loadFeed(){
-    const { data, error } = await supabase.from('posts').select('*, users(nome,username), post_likes(*), comments(*)').order('criado_em',{ascending:false});
+// CARREGAR FEED
+async function loadFeed() {
     const feed = document.getElementById('feed');
-    feed.innerHTML='';
-    data.forEach(p=>{
-        const div = document.createElement('div');
-        div.className='post';
-        div.innerHTML = `
-        <h4>${p.users.nome} (@${p.users.username})</h4>
-        <p>${p.conteudo}</p>
-        ${p.midia_url? (p.tipo=='imagem'? `<img src="${p.midia_url}">` : `<video src="${p.midia_url}" controls></video>`) : ''}
-        <p>Likes: ${p.post_likes.length} | Comentários: ${p.comments.length}</p>
-        <textarea id="comment-${p.id}" placeholder="Comente..."></textarea>
-        <button onclick="addComment(${p.id})">Comentar</button>
-        <button onclick="likePost(${p.id})">Curtir</button>
-        `;
-        feed.appendChild(div);
-    });
+    feed.innerHTML = '<p>Carregando posts...</p>';
+    
+    try {
+        // CARREGA POSTS COM INFORMAÇÕES DO USUÁRIO
+        const { data: posts, error: postsError } = await supabase
+            .from('posts')
+            .select(`
+                id,
+                conteudo,
+                midia_url,
+                tipo,
+                privacidade,
+                criado_em,
+                user_id,
+                users!left(nome, sobrenome, username)
+            `)
+            .order('criado_em', { ascending: false })
+            .limit(20);
+        
+        if (postsError) {
+            console.error('Erro ao carregar posts:', postsError);
+            feed.innerHTML = '<p>Erro ao carregar posts</p>';
+            return;
+        }
+        
+        if (!posts || posts.length === 0) {
+            feed.innerHTML = '<p>Nenhum post encontrado. Seja o primeiro a postar!</p>';
+            return;
+        }
+        
+        feed.innerHTML = '';
+        
+        // PARA CADA POST
+        for (const post of posts) {
+            // BUSCA CONTAGEM DE LIKES
+            const { count: likesCount } = await supabase
+                .from('post_likes')
+                .select('id', { count: 'exact', head: true })
+                .eq('post_id', post.id);
+            
+            // BUSCA COMENTÁRIOS DESTE POST
+            const { data: comments, error: commentsError } = await supabase
+                .from('comments')
+                .select(`
+                    id,
+                    conteudo,
+                    criado_em,
+                    user_id,
+                    users!inner(nome, sobrenome, username)
+                `)
+                .eq('post_id', post.id)
+                .order('criado_em', { ascending: true });
+            
+            const postDiv = document.createElement('div');
+            postDiv.className = 'post';
+            postDiv.id = `post-${post.id}`;
+            
+            const userName = post.users ? 
+                `${post.users.nome || ''} ${post.users.sobrenome || ''}`.trim() || 
+                post.users.username || 'Usuário Desconhecido' : 
+                'Usuário Desconhecido';
+            
+            const firstLetter = userName.charAt(0).toUpperCase();
+            const postDate = new Date(post.criado_em).toLocaleString('pt-BR');
+            
+            // MÍDIA DO POST
+            let mediaHtml = '';
+            if (post.midia_url) {
+                if (post.tipo === 'imagem') {
+                    mediaHtml = `<img src="${post.midia_url}" alt="Imagem" class="post-media" onerror="this.style.display='none'">`;
+                } else if (post.tipo === 'video') {
+                    mediaHtml = `<video src="${post.midia_url}" controls class="post-media"></video>`;
+                } else {
+                    mediaHtml = `<img src="${post.midia_url}" alt="Mídia" class="post-media" onerror="this.style.display='none'">`;
+                }
+            }
+            
+            // COMENTÁRIOS DO POST
+            let commentsHtml = '';
+            if (comments && comments.length > 0) {
+                commentsHtml = '<div class="comment-list">';
+                comments.forEach(comment => {
+                    const commentUserName = comment.users ? 
+                        `${comment.users.nome || ''} ${comment.users.sobrenome || ''}`.trim() || 
+                        comment.users.username || 'Usuário' : 
+                        'Usuário';
+                    const commentDate = new Date(comment.criado_em).toLocaleString('pt-BR');
+                    
+                    commentsHtml += `
+                        <div class="comment-item">
+                            <div class="comment-header">
+                                <div class="comment-author">${commentUserName}</div>
+                                <div class="comment-time">${commentDate}</div>
+                            </div>
+                            <div class="comment-content">${comment.conteudo || ''}</div>
+                        </div>
+                    `;
+                });
+                commentsHtml += '</div>';
+            } else {
+                commentsHtml = '<div class="empty-comments">Nenhum comentário ainda</div>';
+            }
+            
+            // FORMULÁRIO DE COMENTÁRIO (inicialmente escondido)
+            const commentFormHtml = openCommentPostId === post.id ? `
+                <div class="comment-form">
+                    <textarea id="comment-text-${post.id}" placeholder="Digite seu comentário..." rows="3"></textarea>
+                    <button onclick="submitComment(${post.id})">Comentar</button>
+                    <button onclick="cancelComment(${post.id})" style="background:#6c757d; margin-left:10px;">Cancelar</button>
+                </div>
+            ` : '';
+            
+            postDiv.innerHTML = `
+                <div class="post-header">
+                    <div class="post-avatar">${firstLetter}</div>
+                    <div class="post-author">
+                        <div class="post-author-name">${userName}</div>
+                        <div class="post-author-time">${postDate}</div>
+                    </div>
+                </div>
+                <div class="post-content">${post.conteudo || ''}</div>
+                ${mediaHtml}
+                <div class="post-actions">
+                    <button class="btn-like" onclick="likePost(${post.id})">
+                        👍 Curtir (${likesCount || 0})
+                    </button>
+                    <button class="btn-comment" onclick="toggleCommentForm(${post.id})">
+                        💬 Comentar (${comments ? comments.length : 0})
+                    </button>
+                </div>
+                <div class="comments-section">
+                    <h4>💬 Comentários</h4>
+                    ${commentFormHtml}
+                    ${commentsHtml}
+                </div>
+            `;
+            
+            feed.appendChild(postDiv);
+        }
+        
+    } catch (err) {
+        console.error('Erro inesperado:', err);
+        feed.innerHTML = '<p>Erro inesperado ao carregar feed</p>';
+    }
 }
 
-// curtir post
-async function likePost(post_id){
-    await supabase.from('post_likes').insert([{post_id, user_id}]);
+// CURTIR POST
+async function likePost(postId) {
+    try {
+        // VERIFICA SE JÁ CURTIU
+        const { data: existingLike } = await supabase
+            .from('post_likes')
+            .select('id')
+            .eq('post_id', postId)
+            .eq('user_id', user_id)
+            .single();
+        
+        if (existingLike) {
+            // REMOVE LIKE
+            const { error } = await supabase
+                .from('post_likes')
+                .delete()
+                .eq('id', existingLike.id);
+            
+            if (!error) {
+                alert('Like removido!');
+                loadFeed();
+            }
+        } else {
+            // ADICIONA LIKE
+            const { error } = await supabase
+                .from('post_likes')
+                .insert([{
+                    post_id: postId,
+                    user_id: user_id,
+                    tipo: 'curtir'
+                }]);
+            
+            if (!error) {
+                alert('Post curtido!');
+                loadFeed();
+            }
+        }
+    } catch (err) {
+        console.error('Erro ao curtir:', err);
+        alert('Erro ao curtir post');
+    }
+}
+
+// MOSTRAR/OCULTAR FORMULÁRIO DE COMENTÁRIO
+function toggleCommentForm(postId) {
+    if (openCommentPostId === postId) {
+        openCommentPostId = null;
+    } else {
+        openCommentPostId = postId;
+    }
     loadFeed();
 }
 
-// adicionar comentário
-async function addComment(post_id){
-    const content = document.getElementById(`comment-${post_id}`).value.trim();
-    if(!content) return;
-    await supabase.from('comments').insert([{post_id, user_id, conteudo:content}]);
+// CANCELAR COMENTÁRIO
+function cancelComment(postId) {
+    openCommentPostId = null;
     loadFeed();
 }
 
-loadFeed();
+// ENVIAR COMENTÁRIO
+async function submitComment(postId) {
+    const commentText = document.getElementById(`comment-text-${postId}`).value.trim();
+    
+    if (!commentText) {
+        alert('Digite um comentário!');
+        return;
+    }
+    
+    try {
+        const { error } = await supabase
+            .from('comments')
+            .insert([{
+                post_id: postId,
+                user_id: user_id,
+                conteudo: commentText,
+                criado_em: new Date().toISOString()
+            }]);
+        
+        if (error) {
+            console.error('Erro ao comentar:', error);
+            alert('Erro ao adicionar comentário: ' + error.message);
+            return;
+        }
+        
+        alert('Comentário adicionado!');
+        openCommentPostId = null;
+        loadFeed();
+        
+    } catch (err) {
+        console.error('Erro inesperado:', err);
+        alert('Erro ao adicionar comentário');
+    }
+}
+
+// CARREGA O FEED QUANDO A PÁGINA ABRIR
+window.addEventListener('DOMContentLoaded', loadFeed);
 </script>
 
 </body>
