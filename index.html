@@ -7,6 +7,8 @@
 body { margin:0; font-family: Arial, sans-serif; background:#f0f2f5; }
 header { background:#1877f2; color:white; padding:10px 20px; font-size:24px; }
 .container { max-width:800px; margin:20px auto; padding:20px; text-align:center; }
+.right-links { position:fixed; top:60px; right:20px; background:white; padding:10px; border-radius:8px; box-shadow:0 2px 4px rgba(0,0,0,0.1); }
+.right-links a { display:block; margin:5px 0; color:#1877f2; text-decoration:none; }
 </style>
 </head>
 <body>
@@ -25,13 +27,22 @@ header { background:#1877f2; color:white; padding:10px 20px; font-size:24px; }
   <a href="login.html" style="margin:0 10px;">Logout</a>
 </nav>
 
-<!-- SEUS 4 LINKS ORIGINAIS (ABA DA BARRA DE NAV) -->
-<nav>
+<!-- SEUS 4 LINKS ORIGINAIS À DIREITA -->
+<div class="right-links">
   <a href="feed.html">Feed</a>
   <a href="profile.html">Perfil</a>
   <a href="friends.html">Amigos</a>
   <a href="login.html">Login</a>
-</nav>
+</div>
+
+<!-- MAIS 3 LINKS EM TORRE -->
+<div class="right-links" style="top:180px;">
+  <a href="feed1.html">Feed1</a>
+  <a href="feed2.html">Feed2</a>
+  <a href="feed3.html">Feed3</a>
+  <a href="signup.html">Signup</a>
+  <a href="group.html">Group</a>
+</div>
 
 <div class="container">
     <h2>Bem-vindo ao FakeBook</h2>
