@@ -64,21 +64,47 @@ nav a { margin:0 10px; }
 </div>
 
 <!-- Scripts -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.8/dist/umd/supabase.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-// Inicializar Supabase após o script ser carregado
+// URLs do seu projeto Supabase
 const SUPABASE_URL = "https://umzlriwvexvaabliriva.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtemxyaXd2ZXh2YWFibGlyaXZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ4NjEwMjQsImV4cCI6MjA4MDQzNzAyNH0.8miF7Z0e2sTduJhveCk-6GKzroS0CYF-PS6BZeEKpEI";
 
-// Verificar se Supabase está disponível
-if (typeof window.supabase === 'undefined') {
-    window.supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-}
+// Inicializar Supabase CORRETAMENTE
+let supabase;
 
-const supabase = window.supabase;
+async function initSupabase() {
+    try {
+        // Verificar se o objeto Supabase está disponível
+        if (window.supabase) {
+            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            console.log('Supabase inicializado com sucesso');
+            return true;
+        } else {
+            // Tentar importar dinamicamente
+            const { createClient } = window.supabase;
+            supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            console.log('Supabase inicializado via createClient');
+            return true;
+        }
+    } catch (error) {
+        console.error('Erro ao inicializar Supabase:', error);
+        document.getElementById('msg').innerText = 'Erro ao conectar com o servidor';
+        return false;
+    }
+}
 
 async function signup(){
     try {
+        // Verificar se Supabase está inicializado
+        if (!supabase) {
+            const initialized = await initSupabase();
+            if (!initialized) {
+                document.getElementById('msg').innerText = 'Erro: Servidor não disponível';
+                return;
+            }
+        }
+
         const nome = document.getElementById('nome').value.trim();
         const sobrenome = document.getElementById('sobrenome').value.trim();
         const username = document.getElementById('username').value.trim();
@@ -99,7 +125,7 @@ async function signup(){
             return;
         }
 
-        // Verifica duplicados
+        // Verifica duplicados - Correção na query
         const { data: exists, error: existsError } = await supabase
             .from('users')
             .select('id')
@@ -108,7 +134,7 @@ async function signup(){
 
         if(existsError){ 
             console.error('Erro verificação:', existsError); 
-            document.getElementById('msg').innerText='Erro ao verificar duplicados'; 
+            document.getElementById('msg').innerText='Erro ao verificar duplicados: ' + existsError.message; 
             return; 
         }
         
@@ -118,24 +144,27 @@ async function signup(){
         }
 
         // Inserção completa
-        const { data, error } = await supabase.from('users').insert([{
-            nome,
-            sobrenome,
-            username,
-            email,
-            telefone,
-            senha_hash: senha,
-            bio,
-            avatar_url,
-            capa_url,
-            genero,
-            aniversario,
-            cidade,
-            cidade_origem,
-            relacionamento,
-            email_verificado: false,
-            telefone_verificado: false
-        }]).select();
+        const { data, error } = await supabase
+            .from('users')
+            .insert([{
+                nome,
+                sobrenome,
+                username,
+                email,
+                telefone,
+                senha_hash: senha,
+                bio,
+                avatar_url,
+                capa_url,
+                genero,
+                aniversario,
+                cidade,
+                cidade_origem,
+                relacionamento,
+                email_verificado: false,
+                telefone_verificado: false
+            }])
+            .select();
 
         if(error){ 
             console.error('Erro inserção:', error); 
@@ -146,15 +175,31 @@ async function signup(){
         console.log('Cadastro realizado:', data);
         alert('Cadastro realizado com sucesso!');
         window.location.href='login.html';
+        
     } catch(err){
         console.error('Erro inesperado:', err);
         document.getElementById('msg').innerText='Erro inesperado: '+err.message;
     }
 }
 
-// Verificar conexão ao carregar
-window.addEventListener('DOMContentLoaded', () => {
-    console.log('Supabase inicializado:', supabase ? 'Sim' : 'Não');
+// Inicializar Supabase quando a página carregar
+window.addEventListener('DOMContentLoaded', async () => {
+    await initSupabase();
+    
+    // Testar a conexão
+    if (supabase) {
+        try {
+            const { data, error } = await supabase.from('users').select('count', { count: 'exact', head: true });
+            if (error) {
+                console.error('Erro ao testar conexão:', error);
+                document.getElementById('msg').innerText = 'Erro na conexão com o banco de dados';
+            } else {
+                console.log('Conexão com Supabase testada com sucesso');
+            }
+        } catch (testError) {
+            console.error('Erro no teste de conexão:', testError);
+        }
+    }
 });
 </script>
 
