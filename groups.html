@@ -2,130 +2,536 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>FakeBook - Grupos</title>
 <style>
-body { margin:0; font-family: Arial, sans-serif; background:#f0f2f5; }
-header { background:#1877f2; color:white; padding:10px 20px; font-size:24px; }
-.container { max-width:800px; margin:20px auto; display:flex; gap:20px; }
-.group-list { flex:1; background:white; padding:15px; border-radius:10px; max-height:500px; overflow-y:auto; }
-.group-details { flex:2; background:white; padding:15px; border-radius:10px; max-height:500px; display:flex; flex-direction:column; }
-.group { padding:10px; border-bottom:1px solid #ccc; cursor:pointer; }
-.post { background:#f0f0f0; padding:10px; border-radius:6px; margin-bottom:10px; }
-input, textarea { width:100%; padding:5px; margin-top:5px; border-radius:5px; border:1px solid #ccc; }
-button { padding:5px 10px; margin-top:5px; border:none; border-radius:5px; background:#1877f2; color:white; cursor:pointer; }
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body { 
+    font-family: Arial, sans-serif; 
+    background: #f0f2f5; 
+    color: #333;
+    font-size: 16px;
+}
+
+header { 
+    background: #1877f2; 
+    color: white; 
+    padding: 15px 20px; 
+    font-size: 28px;
+    text-align: center;
+}
+
+nav {
+    background: white; 
+    padding: 12px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+nav a {
+    margin: 0 12px;
+    color: #1877f2;
+    text-decoration: none;
+    font-size: 17px;
+    font-weight: 500;
+    padding: 6px 10px;
+    border-radius: 5px;
+    transition: background 0.3s;
+}
+
+nav a:hover {
+    background: #f0f2f5;
+}
+
+.container {
+    max-width: 1000px;
+    margin: 25px auto;
+    display: flex;
+    gap: 25px;
+    padding: 0 20px;
+}
+
+.group-list {
+    flex: 1;
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    max-height: 600px;
+    overflow-y: auto;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.group-details {
+    flex: 2;
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    max-height: 600px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.group {
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+    font-size: 17px;
+    transition: background 0.3s;
+}
+
+.group:hover {
+    background: #f8f9fa;
+}
+
+.post {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    font-size: 16px;
+}
+
+.post strong {
+    color: #1877f2;
+    font-size: 17px;
+}
+
+h3 {
+    font-size: 22px;
+    color: #1877f2;
+    margin-bottom: 20px;
+}
+
+h4 {
+    font-size: 18px;
+    color: #333;
+    margin: 20px 0 10px 0;
+}
+
+input, textarea, select {
+    width: 100%;
+    padding: 12px;
+    margin: 8px 0 15px 0;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    font-size: 16px;
+}
+
+button {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    background: #1877f2;
+    color: white;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+    transition: background 0.3s;
+}
+
+button:hover {
+    background: #166fe5;
+}
+
+.group-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.btn-small {
+    padding: 8px 15px;
+    font-size: 14px;
+    background: #42b72a;
+}
+
+.btn-small:hover {
+    background: #36a420;
+}
+
+.member-status {
+    font-size: 14px;
+    color: #666;
+    margin-top: 5px;
+}
+
+#posts-container {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px;
+}
+
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column;
+    }
+    
+    nav a {
+        display: inline-block;
+        margin: 5px;
+    }
+}
 </style>
 </head>
 <body>
 
-<header> 
-<nav style="background:#fff;padding:10px;text-align:center;box-shadow:0 2px 4px rgba(0,0,0,0.1);">
-  <a href="feed.html" style="margin:0 10px;">Feed</a>
-  <a href="profile.html" style="margin:0 10px;">Perfil</a>
-  <a href="friends.html" style="margin:0 10px;">Amigos</a>
-  <a href="groups.html" style="margin:0 10px;">Grupos</a>
-  <a href="pages.html" style="margin:0 10px;">Páginas</a>
-  <a href="media.html" style="margin:0 10px;">Mídia</a>
-  <a href="stories.html" style="margin:0 10px;">Stories</a>
-  <a href="settings.html" style="margin:0 10px;">Configurações</a>
-  <a href="login.html" style="margin:0 10px;">Logout</a>
+<header>FakeBook</header>
+<nav>
+  <a href="feed.html">Feed</a>
+  <a href="profile.html">Perfil</a>
+  <a href="friends.html">Amigos</a>
+  <a href="groups.html">Grupos</a>
+  <a href="pages.html">Páginas</a>
+  <a href="media.html">Mídia</a>
+  <a href="stories.html">Stories</a>
+  <a href="settings.html">Configurações</a>
+  <a href="login.html">Logout</a>
 </nav>
-</header>
 
 <div class="container">
-<div class="group-list">
-<h3>Grupos</h3>
-<div id="groups-list"></div>
-<h4>Criar Grupo</h4>
-<input type="text" id="group-name" placeholder="Nome do grupo">
-<input type="text" id="group-desc" placeholder="Descrição">
-<select id="group-privacy">
-<option value="publico">Público</option>
-<option value="fechado">Fechado</option>
-<option value="secreto">Secreto</option>
-</select>
-<button onclick="createGroup()">Criar</button>
+    <!-- LISTA DE GRUPOS -->
+    <div class="group-list">
+        <h3>Grupos</h3>
+        <div id="groups-list"></div>
+        
+        <h4>Criar Novo Grupo</h4>
+        <input type="text" id="group-name" placeholder="Nome do grupo">
+        <input type="text" id="group-desc" placeholder="Descrição">
+        <select id="group-privacy">
+            <option value="publico">Público</option>
+            <option value="fechado">Fechado</option>
+            <option value="secreto">Secreto</option>
+        </select>
+        <button onclick="createGroup()">Criar Grupo</button>
+    </div>
+
+    <!-- DETALHES DO GRUPO -->
+    <div class="group-details">
+        <div class="group-header">
+            <h3 id="selected-group-name">Selecione um grupo</h3>
+            <button id="join-btn" class="btn-small" onclick="joinGroup()" style="display:none;">Entrar no Grupo</button>
+        </div>
+        
+        <div class="member-status" id="member-status"></div>
+        
+        <div id="posts-container">
+            <div id="group-posts"></div>
+        </div>
+        
+        <div id="post-form" style="display:none;">
+            <textarea id="post-content" placeholder="Escreva algo no grupo..." rows="3"></textarea>
+            <input type="text" id="post-media" placeholder="URL de mídia (opcional)">
+            <button onclick="createGroupPost()">Postar</button>
+        </div>
+    </div>
 </div>
 
-<div class="group-details">
-<h3 id="selected-group-name">Selecione um grupo</h3>
-<div id="group-posts" style="flex:1; overflow-y:auto;"></div>
-<textarea id="post-content" placeholder="Escreva algo no grupo..."></textarea>
-<input type="text" id="post-media" placeholder="URL de mídia (opcional)">
-<button onclick="createGroupPost()">Postar</button>
-</div>
-</div>
-
-<script src="https://unpkg.com/@supabase/supabase-js/umd/supabase.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
-const supabaseUrl = "https://umzlriwvexvaabliriva.supabase.co";
-const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtemxyaXd2ZXh2YWFibGlyaXZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ4NjEwMjQsImV4cCI6MjA4MDQzNzAyNH0.8miF7Z0e2sTduJhveCk-6GKzroS0CYF-PS6BZeEKpEI";
-const supabase = Supabase.createClient(supabaseUrl, supabaseKey);
+const SUPABASE_URL = "https://umzlriwvexvaabliriva.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSEuIiwicmVmIjoiInV0emxyaXd2ZXh2YW.FibGlyaXZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ4NjEwMjQsImV4cCI6MjA4MDQzNzAyNH0.8miF7Z0e2sTduJhveCk-6GKzroS0CYF-PS6BZeEKpEI";
+
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 const user_id = localStorage.getItem('user_id');
-if(!user_id){ window.location.href='login.html'; }
-
-let selectedGroup = null;
-
-// carregar grupos
-async function loadGroups(){
-    const { data, error } = await supabase.from('groups').select('*').order('criado_em',{ascending:false});
-    const list = document.getElementById('groups-list');
-    list.innerHTML='';
-    data.forEach(g=>{
-        const div = document.createElement('div');
-        div.className='group';
-        div.innerText = g.nome;
-        div.onclick = ()=>{ selectGroup(g.id, g.nome); };
-        list.appendChild(div);
-    });
+if(!user_id) { 
+    alert('Faça login primeiro!');
+    window.location.href = 'login.html'; 
 }
 
-// selecionar grupo
-function selectGroup(id, name){
+let selectedGroup = null;
+let isMember = false;
+let groupPrivacy = '';
+
+// CARREGAR GRUPOS
+async function loadGroups() {
+    const list = document.getElementById('groups-list');
+    list.innerHTML = '<p>Carregando grupos...</p>';
+    
+    try {
+        const { data, error } = await supabase
+            .from('groups')
+            .select('*')
+            .order('criado_em', { ascending: false });
+        
+        if (error) {
+            console.error('Erro grupos:', error);
+            list.innerHTML = '<p>Erro ao carregar grupos</p>';
+            return;
+        }
+        
+        if (!data || data.length === 0) {
+            list.innerHTML = '<p>Nenhum grupo encontrado</p>';
+            return;
+        }
+        
+        list.innerHTML = '';
+        
+        data.forEach(group => {
+            const div = document.createElement('div');
+            div.className = 'group';
+            div.innerHTML = `
+                <div style="font-weight:bold;">${group.nome}</div>
+                <div style="font-size:14px; color:#666; margin-top:5px;">${group.privacidade === 'publico' ? '🌍 Público' : group.privacidade === 'fechado' ? '🔒 Fechado' : '🕵️ Secreto'}</div>
+                <div style="font-size:14px; color:#888; margin-top:3px;">${group.descricao || 'Sem descrição'}</div>
+            `;
+            
+            div.onclick = () => {
+                selectGroup(group.id, group.nome, group.privacidade);
+            };
+            
+            list.appendChild(div);
+        });
+        
+    } catch (err) {
+        console.error('Erro:', err);
+        list.innerHTML = '<p>Erro ao carregar grupos</p>';
+    }
+}
+
+// SELECIONAR GRUPO
+async function selectGroup(id, name, privacy) {
     selectedGroup = id;
+    groupPrivacy = privacy;
+    
     document.getElementById('selected-group-name').innerText = name;
+    document.getElementById('member-status').innerText = '';
+    document.getElementById('post-form').style.display = 'none';
+    document.getElementById('join-btn').style.display = 'none';
+    
+    // VERIFICA SE É MEMBRO
+    const { data: membership } = await supabase
+        .from('group_members')
+        .select('id, cargo')
+        .eq('group_id', id)
+        .eq('user_id', user_id)
+        .single();
+    
+    isMember = !!membership;
+    
+    if (isMember) {
+        document.getElementById('member-status').innerText = `Você é ${membership.cargo} deste grupo`;
+        document.getElementById('post-form').style.display = 'block';
+    } else {
+        if (privacy === 'publico') {
+            document.getElementById('member-status').innerText = 'Grupo público - Você pode ver posts';
+            document.getElementById('join-btn').style.display = 'block';
+            document.getElementById('join-btn').innerText = 'Entrar no Grupo';
+        } else if (privacy === 'fechado') {
+            document.getElementById('member-status').innerText = 'Grupo fechado - Solicite entrada';
+            document.getElementById('join-btn').style.display = 'block';
+            document.getElementById('join-btn').innerText = 'Solicitar Entrada';
+        } else {
+            document.getElementById('member-status').innerText = 'Grupo secreto - Acesso apenas para membros';
+        }
+    }
+    
     loadGroupPosts();
 }
 
-// criar grupo
-async function createGroup(){
+// ENTRAR NO GRUPO
+async function joinGroup() {
+    if (!selectedGroup) return;
+    
+    try {
+        const { error } = await supabase
+            .from('group_members')
+            .insert([{
+                group_id: selectedGroup,
+                user_id: user_id,
+                cargo: groupPrivacy === 'fechado' ? 'solicitante' : 'membro'
+            }]);
+        
+        if (error) {
+            alert('Erro ao entrar no grupo: ' + error.message);
+            return;
+        }
+        
+        alert(groupPrivacy === 'fechado' ? 'Solicitação enviada!' : 'Você entrou no grupo!');
+        selectGroup(selectedGroup, document.getElementById('selected-group-name').innerText, groupPrivacy);
+        
+    } catch (err) {
+        console.error('Erro:', err);
+        alert('Erro ao entrar no grupo');
+    }
+}
+
+// CRIAR GRUPO
+async function createGroup() {
     const nome = document.getElementById('group-name').value.trim();
     const descricao = document.getElementById('group-desc').value.trim();
     const privacidade = document.getElementById('group-privacy').value;
-    if(!nome) return alert('Digite o nome do grupo');
-    await supabase.from('groups').insert([{nome, descricao, privacidade}]);
-    document.getElementById('group-name').value='';
-    document.getElementById('group-desc').value='';
-    loadGroups();
+    
+    if (!nome) {
+        alert('Digite o nome do grupo');
+        return;
+    }
+    
+    try {
+        // CRIA O GRUPO
+        const { data: newGroup, error: groupError } = await supabase
+            .from('groups')
+            .insert([{ nome, descricao, privacidade }])
+            .select()
+            .single();
+        
+        if (groupError) {
+            alert('Erro ao criar grupo: ' + groupError.message);
+            return;
+        }
+        
+        // ADICIONA CRIADOR COMO ADMIN
+        await supabase
+            .from('group_members')
+            .insert([{
+                group_id: newGroup.id,
+                user_id: user_id,
+                cargo: 'admin'
+            }]);
+        
+        alert('Grupo criado com sucesso!');
+        
+        document.getElementById('group-name').value = '';
+        document.getElementById('group-desc').value = '';
+        
+        loadGroups();
+        selectGroup(newGroup.id, newGroup.nome, newGroup.privacidade);
+        
+    } catch (err) {
+        console.error('Erro:', err);
+        alert('Erro ao criar grupo');
+    }
 }
 
-// carregar posts do grupo
-async function loadGroupPosts(){
-    if(!selectedGroup) return;
-    const { data, error } = await supabase.from('group_posts').select('*').eq('group_id', selectedGroup).order('criado_em',{ascending:false});
+// CARREGAR POSTS DO GRUPO
+async function loadGroupPosts() {
+    if (!selectedGroup) return;
+    
     const container = document.getElementById('group-posts');
-    container.innerHTML='';
-    data.forEach(p=>{
-        const div = document.createElement('div');
-        div.className='post';
-        div.innerHTML = `<p>${p.conteudo}</p>${p.midia_url?'<img src="'+p.midia_url+'" width="100%">':''}`;
-        container.appendChild(div);
-    });
+    container.innerHTML = '<p>Carregando posts...</p>';
+    
+    try {
+        // SE NÃO É MEMBRO E GRUPO NÃO É PÚBLICO
+        if (!isMember && groupPrivacy !== 'publico') {
+            container.innerHTML = '<p>Você precisa ser membro para ver os posts deste grupo</p>';
+            return;
+        }
+        
+        // CARREGA POSTS COM INFORMAÇÕES DO USUÁRIO
+        const { data, error } = await supabase
+            .from('group_posts')
+            .select(`
+                id,
+                conteudo,
+                midia_url,
+                criado_em,
+                user_id,
+                users!inner(nome, sobrenome, username)
+            `)
+            .eq('group_id', selectedGroup)
+            .order('criado_em', { ascending: false })
+            .limit(20);
+        
+        if (error) {
+            console.error('Erro posts:', error);
+            container.innerHTML = '<p>Erro ao carregar posts</p>';
+            return;
+        }
+        
+        if (!data || data.length === 0) {
+            container.innerHTML = '<p>Nenhum post neste grupo</p>';
+            return;
+        }
+        
+        container.innerHTML = '';
+        
+        data.forEach(post => {
+            const postDiv = document.createElement('div');
+            postDiv.className = 'post';
+            
+            const userName = post.users ? 
+                `${post.users.nome || ''} ${post.users.sobrenome || ''}`.trim() || 
+                post.users.username || 'Usuário' : 
+                'Usuário';
+            
+            const postDate = post.criado_em ? 
+                new Date(post.criado_em).toLocaleString('pt-BR') : '';
+            
+            let mediaHtml = '';
+            if (post.midia_url) {
+                mediaHtml = `<img src="${post.midia_url}" style="max-width:100%; border-radius:8px; margin-top:10px;">`;
+            }
+            
+            postDiv.innerHTML = `
+                <div>
+                    <strong>${userName}</strong>
+                    <small style="color:#666; margin-left:10px;">${postDate}</small>
+                </div>
+                <div style="margin:10px 0;">${post.conteudo || ''}</div>
+                ${mediaHtml}
+            `;
+            
+            container.appendChild(postDiv);
+        });
+        
+    } catch (err) {
+        console.error('Erro:', err);
+        container.innerHTML = '<p>Erro ao carregar posts</p>';
+    }
 }
 
-// criar post no grupo
-async function createGroupPost(){
-    if(!selectedGroup) return alert('Selecione um grupo');
+// CRIAR POST NO GRUPO
+async function createGroupPost() {
+    if (!selectedGroup || !isMember) {
+        alert('Você precisa ser membro para postar');
+        return;
+    }
+    
     const conteudo = document.getElementById('post-content').value.trim();
     const midia_url = document.getElementById('post-media').value.trim();
-    if(!conteudo && !midia_url) return alert('Digite algo ou insira mídia');
-    await supabase.from('group_posts').insert([{group_id:selectedGroup, user_id, conteudo, midia_url}]);
-    document.getElementById('post-content').value='';
-    document.getElementById('post-media').value='';
-    loadGroupPosts();
+    
+    if (!conteudo && !midia_url) {
+        alert('Digite algo ou insira mídia');
+        return;
+    }
+    
+    try {
+        const { error } = await supabase
+            .from('group_posts')
+            .insert([{
+                group_id: selectedGroup,
+                user_id: user_id,
+                conteudo: conteudo,
+                midia_url: midia_url || null
+            }]);
+        
+        if (error) {
+            alert('Erro ao criar post: ' + error.message);
+            return;
+        }
+        
+        alert('Post criado com sucesso!');
+        
+        document.getElementById('post-content').value = '';
+        document.getElementById('post-media').value = '';
+        
+        loadGroupPosts();
+        
+    } catch (err) {
+        console.error('Erro:', err);
+        alert('Erro ao criar post');
+    }
 }
 
-loadGroups();
+// INICIALIZAR
+window.addEventListener('DOMContentLoaded', loadGroups);
 </script>
 
 </body>
