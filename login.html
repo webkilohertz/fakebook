@@ -10,6 +10,7 @@ input { width:100%; padding:10px; margin:10px 0; border-radius:6px; border:1px s
 button { width:100%; padding:10px; border:none; background:#1877f2; color:white; border-radius:6px; cursor:pointer; margin-top:10px; }
 p { font-size:14px; text-align:center; }
 p a { color:#1877f2; text-decoration:none; }
+pre { color: red; font-size: 12px; }
 </style>
 </head>
 <body>
@@ -23,26 +24,131 @@ p a { color:#1877f2; text-decoration:none; }
 <pre id="msg"></pre>
 </div>
 
-<script src="https://unpkg.com/@supabase/supabase-js/umd/supabase.js"></script>
+<!-- Use a MESMA versão do Supabase -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
-const supabaseUrl = "https://umzlriwvexvaabliriva.supabase.co";
-const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtemxyaXd2ZXh2YWFibGlyaXZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ4NjEwMjQsImV4cCI6MjA4MDQzNzAyNH0.8miF7Z0e2sTduJhveCk-6GKzroS0CYF-PS6BZeEKpEI";
-const supabase = Supabase.createClient(supabaseUrl, supabaseKey);
+// URLs do seu projeto
+const SUPABASE_URL = "https://umzlriwvexvaabliriva.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtemxyaXd2ZXh2YWFibGlyaXZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ4NjEwMjQsImV4cCI6MjA4MDQzNzAyNH0.8miF7Z0e2sTduJhveCk-6GKzroS0CYF-PS6BZeEKpEI";
+
+// Inicializa o Supabase - FORMA CORRETA
+let supabase;
+
+function initSupabase() {
+    try {
+        console.log('Inicializando Supabase...');
+        
+        // Forma 1: Verificar se a biblioteca está carregada
+        if (typeof window.supabase !== 'undefined') {
+            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            console.log('✅ Supabase inicializado!');
+            return true;
+        }
+        // Forma 2: Tentar forma alternativa
+        else if (typeof Supabase !== 'undefined') {
+            supabase = Supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            console.log('✅ Supabase inicializado (forma alternativa)!');
+            return true;
+        } else {
+            console.error('❌ Supabase não encontrado');
+            return false;
+        }
+    } catch (error) {
+        console.error('Erro ao inicializar Supabase:', error);
+        return false;
+    }
+}
 
 async function login(){
-    const username = document.getElementById('username').value.trim();
-    const password = document.getElementById('password').value.trim();
-    if(!username || !password){ document.getElementById('msg').innerText='Preencha todos os campos'; return; }
-    
-    // procura usuário
-    const { data, error } = await supabase.from('users').select('*').or(`username.eq.${username},email.eq.${username}`).eq('senha_hash', password).limit(1);
-    if(error){ document.getElementById('msg').innerText='Erro: '+error.message; return; }
-    if(data.length===0){ document.getElementById('msg').innerText='Usuário ou senha incorretos'; return; }
-    
-    // sucesso
-    localStorage.setItem('user_id', data[0].id);
-    window.location.href = 'index.html';
+    try {
+        // Inicializa se não estiver
+        if (!supabase) {
+            const success = initSupabase();
+            if (!success) {
+                document.getElementById('msg').innerText = 'Erro: Biblioteca não carregada';
+                return;
+            }
+        }
+
+        const username = document.getElementById('username').value.trim();
+        const password = document.getElementById('password').value.trim();
+        
+        if(!username || !password){ 
+            document.getElementById('msg').innerText='Preencha todos os campos'; 
+            return; 
+        }
+        
+        console.log('🔍 Buscando usuário:', username);
+        
+        // Procura usuário - CORRIGIDO: usar template literals corretamente
+        const { data, error } = await supabase
+            .from('users')
+            .select('*')
+            .or(`username.eq.${username},email.eq.${username}`)
+            .eq('senha_hash', password)
+            .limit(1);
+        
+        if(error){ 
+            console.error('Erro na busca:', error);
+            document.getElementById('msg').innerText='Erro: '+error.message; 
+            return; 
+        }
+        
+        if(!data || data.length===0){ 
+            document.getElementById('msg').innerText='Usuário ou senha incorretos'; 
+            return; 
+        }
+        
+        console.log('✅ Login bem-sucedido:', data[0].username);
+        
+        // Salva dados do usuário
+        localStorage.setItem('user_id', data[0].id);
+        localStorage.setItem('user_name', data[0].username);
+        localStorage.setItem('user_email', data[0].email);
+        
+        // Redireciona
+        window.location.href = 'index.html';
+        
+    } catch(err) {
+        console.error('Erro inesperado:', err);
+        document.getElementById('msg').innerText = 'Erro: ' + err.message;
+    }
 }
+
+// Inicializa quando a página carrega
+window.addEventListener('DOMContentLoaded', () => {
+    console.log('Página de login carregada');
+    initSupabase();
+    
+    // Testa a conexão
+    testConnection();
+});
+
+// Função para testar conexão
+async function testConnection() {
+    if (!supabase) return;
+    
+    try {
+        const { data, error } = await supabase
+            .from('users')
+            .select('count', { count: 'exact', head: true });
+            
+        if (error) {
+            console.log('⚠️ Teste falhou:', error.message);
+        } else {
+            console.log('✅ Conexão OK');
+        }
+    } catch (error) {
+        console.log('⚠️ Não foi possível testar');
+    }
+}
+
+// Permite login com Enter
+document.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        login();
+    }
+});
 </script>
 
 </body>
