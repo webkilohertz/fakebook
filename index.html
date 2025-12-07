@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>FakeBook - Feed</title>
+<style>
+body { margin:0; font-family: Arial, sans-serif; background:#f0f2f5; }
+header { background:#1877f2; color:white; padding:20px; font-size:28px; text-align:center; }
+nav { background:white; padding:15px; text-align:center; box-shadow:0 2px 5px rgba(0,0,0,0.1); }
+nav a { margin:0 15px; color:#1877f2; text-decoration:none; font-size:18px; font-weight:500; }
+.container { padding:25px; max-width:900px; margin:0 auto; }
+.post { background:white; padding:25px; border-radius:12px; margin-bottom:25px; box-shadow:0 4px 12px rgba(0,0,0,0.1); }
+.post-header { display:flex; align-items:center; margin-bottom:15px; }
+.post-avatar { width:50px; height:50px; border-radius:50%; margin-right:15px; background:#1877f2; color:white; display:flex; align-items:center; justify-content:center; font-size:20px; }
+.post-info { flex:1; }
+.post-author { font-weight:bold; font-size:18px; color:#1877f2; }
+.post-time { color:#666; font-size:14px; }
+.post-content { font-size:18px; line-height:1.5; margin:20px 0; }
+.post-media { max-width:100%; border-radius:8px; margin-top:15px; }
+.post-actions { margin-top:20px; padding-top:20px; border-top:1px solid #eee; display:flex; gap:15px; }
+.action-btn { flex:1; padding:12px; border:none; border-radius:8px; font-size:16px; cursor:pointer; transition:all 0.3s; }
+.like-btn { background:#f0f2f5; color:#1877f2; }
+.comment-btn { background:#f0f2f5; color:#1877f2; }
+.share-btn { background:#25D366; color:white; }
+.like-btn:hover { background:#e7f3ff; }
+.comment-btn:hover { background:#e7f3ff; }
+.share-btn:hover { background:#1da851; }
+</style>
+</head>
+<body>
+
+<header>FakeBook</header>
+<nav>
+  <a href="feed.html">Feed</a>
+  <a href="profile.html">Perfil</a>
+  <a href="friends.html">Amigos</a>
+  <a href="login.html">Logout</a>
+</nav>
+    
+<div class="container">
+    <h2 style="font-size:24px; margin-bottom:20px;">Feed de Posts</h2>
+    <div id="posts"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+const SUPABASE_URL = "https://umzlriwvexvaabliriva.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtemxyaXd2ZXh2YWFibGlyaXZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ4NjEwMjQsImV4cCI6MjA4MDQzNzAyNH0.8miF7Z0e2sTduJhveCk-6GKzroS0CYF-PS6BZeEKpEI";
+
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+async function loadPosts() {
+    const container = document.getElementById('posts');
+    container.innerHTML = '<p style="text-align:center; padding:40px; font-size:18px;">Carregando posts...</p>';
+
+    try {
+        // Puxa TODOS os posts (mesmo sem usuário)
+        const { data: posts, error: postsError } = await supabase
+            .from('posts')
+            .select(`
+                id,
+                conteudo,
+                midia_url,
+                criado_em,
+                user_id,
+                users!left(nome, sobrenome, username)
+            `)
+            .order('criado_em', { ascending: false })
+            .limit(50);
+
+        if (postsError) {
+            console.error('Erro posts:', postsError);
+            container.innerHTML = '<p style="color:red; text-align:center;">Erro ao carregar posts</p>';
+            return;
+        }
+
+        if (!posts || posts.length === 0) {
+            container.innerHTML = '<p style="text-align:center; padding:40px; font-size:18px;">Nenhum post encontrado</p>';
+            return;
+        }
+
+        container.innerHTML = '';
+
+        for (const post of posts) {
+            const postDiv = document.createElement('div');
+            postDiv.className = 'post';
+            
+            const postDate = new Date(post.criado_em).toLocaleString('pt-BR');
+            const userName = post.users ? `${post.users.nome || ''} ${post.users.sobrenome || ''}`.trim() || post.users.username || 'Usuário Desconhecido' : 'Usuário Desconhecido';
+            const firstLetter = userName.charAt(0).toUpperCase();
+            
+            let mediaHtml = '';
+            if (post.midia_url) {
+                mediaHtml = `<img src="${post.midia_url}" alt="Mídia" class="post-media">`;
+            }
+            
+            // Pega contagem de likes para este post
+            const { count: likesCount } = await supabase
+                .from('post_likes')
+                .select('id', { count: 'exact', head: true })
+                .eq('post_id', post.id);
+            
+            postDiv.innerHTML = `
+                <div class="post-header">
+                    <div class="post-avatar">${firstLetter}</div>
+                    <div class="post-info">
+                        <div class="post-author">${userName}</div>
+                        <div class="post-time">${postDate}</div>
+                    </div>
+                </div>
+                <div class="post-content">${post.conteudo || ''}</div>
+                ${mediaHtml}
+                <div class="post-actions">
+                    <button class="action-btn like-btn" onclick="likePost(${post.id})">
+                        👍 Curtir (${likesCount || 0})
+                    </button>
+                    <button class="action-btn comment-btn" onclick="commentPost(${post.id})">
+                        💬 Comentar
+                    </button>
+                    <button class="action-btn share-btn" onclick="shareToWhatsapp(${post.id})">
+                        📱 Compartilhar no Zap
+                    </button>
+                </div>
+            `;
+            
+            container.appendChild(postDiv);
+        }
+
+    } catch (err) {
+        console.error('Erro inesperado:', err);
+        container.innerHTML = '<p style="color:red; text-align:center;">Erro inesperado ao carregar posts</p>';
+    }
+}
+
+async function likePost(postId) {
+    try {
+        const userId = localStorage.getItem('user_id');
+        if (!userId) {
+            alert('Você precisa estar logado para curtir!');
+            window.location.href = 'login.html';
+            return;
+        }
+
+        // Verifica se já curtiu
+        const { data: existingLike } = await supabase
+            .from('post_likes')
+            .select('id')
+            .eq('post_id', postId)
+            .eq('user_id', userId)
+            .single();
+
+        if (existingLike) {
+            // Remove like se já curtiu
+            const { error } = await supabase
+                .from('post_likes')
+                .delete()
+                .eq('id', existingLike.id);
+            
+            if (!error) {
+                alert('Like removido!');
+                loadPosts();
+            }
+        } else {
+            // Adiciona like
+            const { error } = await supabase
+                .from('post_likes')
+                .insert([{
+                    post_id: postId,
+                    user_id: userId,
+                    tipo: 'curtir'
+                }]);
+            
+            if (!error) {
+                alert('Post curtido!');
+                loadPosts();
+            }
+        }
+    } catch (err) {
+        console.error('Erro no like:', err);
+        alert('Erro ao curtir post');
+    }
+}
+
+function commentPost(postId) {
+    const comment = prompt('Digite seu comentário:');
+    if (!comment) return;
+    
+    alert(`Comentário adicionado ao post ${postId}: "${comment}"`);
+    // Aqui você implementa a lógica para salvar comentários
+}
+
+function shareToWhatsapp(postId) {
+    const postUrl = `${window.location.origin}/post.html?id=${postId}`;
+    const whatsappUrl = `https://wa.me/?text=Confira este post no FakeBook: ${postUrl}`;
+    window.open(whatsappUrl, '_blank');
+}
+
+window.addEventListener('DOMContentLoaded', loadPosts);
+</script>
+
+</body>
+</html>
