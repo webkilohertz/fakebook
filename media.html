@@ -2,94 +2,216 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>FakeBook - Mídia</title>
 <style>
-body { margin:0; font-family: Arial, sans-serif; background:#f0f2f5; }
-header { background:#1877f2; color:white; padding:10px 20px; font-size:24px; }
-.container { max-width:800px; margin:20px auto; background:white; padding:20px; border-radius:10px; }
-.media-item { margin-bottom:15px; }
-img, video { max-width:100%; border-radius:6px; display:block; margin-bottom:5px; }
-button { padding:5px 10px; border:none; border-radius:5px; background:#1877f2; color:white; cursor:pointer; }
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:Arial,sans-serif; background:#f0f2f5; font-size:18px; }
+header { background:#1877f2; color:white; padding:20px; text-align:center; font-size:28px; }
+nav { background:white; padding:15px; text-align:center; box-shadow:0 2px 8px rgba(0,0,0,0.1); }
+nav a { margin:0 15px; color:#1877f2; text-decoration:none; font-size:18px; font-weight:500; padding:8px 12px; border-radius:6px; }
+nav a:hover { background:#f0f2f5; }
+.container { max-width:900px; margin:25px auto; background:white; padding:25px; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.1); }
+.media-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(250px, 1fr)); gap:20px; margin:25px 0; }
+.media-item { background:#f8f9fa; padding:15px; border-radius:10px; }
+.media-item img, .media-item video { width:100%; border-radius:8px; margin-bottom:10px; }
+.media-info { font-size:16px; color:#666; }
+button { padding:12px 20px; border:none; border-radius:8px; background:#1877f2; color:white; cursor:pointer; font-size:18px; }
+button:hover { background:#166fe5; }
+h3 { font-size:24px; color:#1877f2; margin-bottom:15px; }
+input, select, textarea { width:100%; padding:15px; margin:10px 0; border-radius:8px; border:1px solid #ddd; font-size:18px; }
+.add-media { background:#f8f9fa; padding:20px; border-radius:12px; margin-bottom:25px; }
+.empty-message { text-align:center; padding:40px; font-size:20px; color:#666; }
+.btn-danger { background:#f02849; }
+.btn-danger:hover { background:#e02445; }
 </style>
 </head>
 <body>
 
-<header>FakeBook - Mídia
-<nav style="background:#fff;padding:10px;text-align:center;box-shadow:0 2px 4px rgba(0,0,0,0.1);">
-  <a href="feed.html" style="margin:0 10px;">Feed</a>
-  <a href="profile.html" style="margin:0 10px;">Perfil</a>
-  <a href="friends.html" style="margin:0 10px;">Amigos</a>
-  <a href="groups.html" style="margin:0 10px;">Grupos</a>
-  <a href="pages.html" style="margin:0 10px;">Páginas</a>
-  <a href="media.html" style="margin:0 10px;">Mídia</a>
-  <a href="stories.html" style="margin:0 10px;">Stories</a>
-  <a href="settings.html" style="margin:0 10px;">Configurações</a>
-  <a href="login.html" style="margin:0 10px;">Logout</a>
+<header>FakeBook - Mídia</header>
+<nav>
+  <a href="feed.html">Feed</a>
+  <a href="profile.html">Perfil</a>
+  <a href="friends.html">Amigos</a>
+  <a href="groups.html">Grupos</a>
+  <a href="pages.html">Páginas</a>
+  <a href="media.html">Mídia</a>
+  <a href="stories.html">Stories</a>
+  <a href="settings.html">Configurações</a>
+  <a href="login.html">Logout</a>
 </nav>
 
-
-</header>
-
 <div class="container">
-<h3>Suas Mídias</h3>
-<div id="media-list"></div>
-
-<h3>Adicionar Mídia</h3>
-<input type="text" id="media-url" placeholder="URL da imagem ou vídeo">
-<select id="media-type">
-<option value="image">Imagem</option>
-<option value="video">Vídeo</option>
-</select>
-<input type="text" id="media-origem" placeholder="Origem: post/story/perfil">
-<button onclick="addMedia()">Adicionar</button>
+    <h3>Adicionar Nova Mídia</h3>
+    <div class="add-media">
+        <input type="text" id="media-url" placeholder="URL da imagem ou vídeo (ex: https://exemplo.com/imagem.jpg)">
+        <select id="media-type">
+            <option value="image">Imagem</option>
+            <option value="video">Vídeo</option>
+        </select>
+        <select id="media-origem">
+            <option value="post">Post</option>
+            <option value="story">Story</option>
+            <option value="perfil">Perfil</option>
+            <option value="grupo">Grupo</option>
+            <option value="outro">Outro</option>
+        </select>
+        <textarea id="media-desc" placeholder="Descrição (opcional)" rows="3"></textarea>
+        <button onclick="addMedia()">Adicionar Mídia</button>
+    </div>
+    
+    <h3>Suas Mídias</h3>
+    <div id="media-list" class="empty-message">Carregando suas mídias...</div>
 </div>
 
-<script src="https://unpkg.com/@supabase/supabase-js/umd/supabase.js"></script>
+<!-- MESMO CDN DO groups.html -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
-const supabaseUrl = "https://umzlriwvexvaabliriva.supabase.co";
-const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtemxyaXd2ZXh2YWFibGlyaXZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ4NjEwMjQsImV4cCI6MjA4MDQzNzAyNH0.8miF7Z0e2sTduJhveCk-6GKzroS0CYF-PS6BZeEKpEI";
-const supabase = Supabase.createClient(supabaseUrl, supabaseKey);
+// MESMA CHAVE DO groups.html
+const SUPABASE_URL = "https://umzlriwvexvaabliriva.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtemxyaXd2ZXh2YWFibGlyaXZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ4NjEwMjQsImV4cCI6MjA4MDQzNzAyNH0.8miF7Z0e2sTduJhveCk-6GKzroS0CYF-PS6BZeEKpEI";
+
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 const user_id = localStorage.getItem('user_id');
-if(!user_id){ window.location.href='login.html'; }
-
-// carregar mídias
-async function loadMedia(){
-    const { data, error } = await supabase.from('media').select('*').eq('user_id', user_id).order('criado_em',{ascending:false});
-    const container = document.getElementById('media-list');
-    container.innerHTML='';
-    if(error){ container.innerHTML='Erro ao carregar mídias'; return; }
-    data.forEach(m=>{
-        const div = document.createElement('div');
-        div.className='media-item';
-        if(m.tipo=='image'){
-            div.innerHTML = `<img src="${m.url}">Origem: ${m.origem} <button onclick="deleteMedia(${m.id})">Excluir</button>`;
-        } else if(m.tipo=='video'){
-            div.innerHTML = `<video controls src="${m.url}"></video>Origem: ${m.origem} <button onclick="deleteMedia(${m.id})">Excluir</button>`;
-        }
-        container.appendChild(div);
-    });
+if(!user_id) { 
+    alert('Faça login primeiro!');
+    window.location.href = 'login.html'; 
 }
 
-// adicionar mídia
-async function addMedia(){
+// CARREGAR MÍDIAS
+async function loadMedia() {
+    const container = document.getElementById('media-list');
+    
+    try {
+        const { data, error } = await supabase
+            .from('media')
+            .select('*')
+            .eq('user_id', user_id)
+            .order('criado_em', { ascending: false });
+        
+        if (error) {
+            console.error('Erro mídias:', error);
+            container.innerHTML = '<div class="empty-message">Erro ao carregar mídias</div>';
+            return;
+        }
+        
+        if (!data || data.length === 0) {
+            container.innerHTML = '<div class="empty-message">Você ainda não tem mídias. Adicione sua primeira mídia!</div>';
+            return;
+        }
+        
+        container.innerHTML = '<div class="media-grid" id="media-grid"></div>';
+        const grid = document.getElementById('media-grid');
+        
+        data.forEach(media => {
+            const mediaDiv = document.createElement('div');
+            mediaDiv.className = 'media-item';
+            
+            let mediaContent = '';
+            if (media.tipo === 'image') {
+                mediaContent = `<img src="${media.url}" alt="Imagem" onerror="this.src='https://via.placeholder.com/300x200?text=Imagem+não+carregada'">`;
+            } else if (media.tipo === 'video') {
+                mediaContent = `<video controls src="${media.url}" style="background:#000;"></video>`;
+            } else {
+                mediaContent = `<div style="padding:40px; text-align:center; background:#eee;">Tipo: ${media.tipo}</div>`;
+            }
+            
+            const mediaDate = media.criado_em ? 
+                new Date(media.criado_em).toLocaleString('pt-BR') : '';
+            
+            mediaDiv.innerHTML = `
+                ${mediaContent}
+                <div class="media-info">
+                    <div><strong>Tipo:</strong> ${media.tipo === 'image' ? '🖼️ Imagem' : '🎬 Vídeo'}</div>
+                    <div><strong>Origem:</strong> ${media.origem || 'Não informada'}</div>
+                    <div><strong>Data:</strong> ${mediaDate}</div>
+                    ${media.descricao ? `<div><strong>Descrição:</strong> ${media.descricao}</div>` : ''}
+                    <button onclick="deleteMedia(${media.id})" class="btn-danger" style="margin-top:10px; width:100%;">Excluir</button>
+                </div>
+            `;
+            
+            grid.appendChild(mediaDiv);
+        });
+        
+    } catch (err) {
+        console.error('Erro:', err);
+        container.innerHTML = '<div class="empty-message">Erro ao carregar mídias</div>';
+    }
+}
+
+// ADICIONAR MÍDIA
+async function addMedia() {
     const url = document.getElementById('media-url').value.trim();
     const tipo = document.getElementById('media-type').value;
-    const origem = document.getElementById('media-origem').value.trim();
-    if(!url || !tipo || !origem) return alert('Preencha todos os campos');
-    await supabase.from('media').insert([{user_id, url, tipo, origem}]);
-    document.getElementById('media-url').value='';
-    document.getElementById('media-origem').value='';
-    loadMedia();
+    const origem = document.getElementById('media-origem').value;
+    const descricao = document.getElementById('media-desc').value.trim();
+    
+    if (!url) {
+        alert('Insira a URL da mídia');
+        return;
+    }
+    
+    try {
+        const { error } = await supabase
+            .from('media')
+            .insert([{
+                user_id: user_id,
+                url: url,
+                tipo: tipo,
+                origem: origem,
+                descricao: descricao || null
+            }]);
+        
+        if (error) {
+            alert('Erro ao adicionar mídia: ' + error.message);
+            return;
+        }
+        
+        alert('Mídia adicionada com sucesso!');
+        
+        // Limpa formulário
+        document.getElementById('media-url').value = '';
+        document.getElementById('media-desc').value = '';
+        
+        // Recarrega lista
+        loadMedia();
+        
+    } catch (err) {
+        console.error('Erro:', err);
+        alert('Erro ao adicionar mídia');
+    }
 }
 
-// excluir mídia
-async function deleteMedia(id){
-    await supabase.from('media').delete().eq('id', id);
-    loadMedia();
+// EXCLUIR MÍDIA
+async function deleteMedia(id) {
+    if (!confirm('Tem certeza que deseja excluir esta mídia?')) {
+        return;
+    }
+    
+    try {
+        const { error } = await supabase
+            .from('media')
+            .delete()
+            .eq('id', id)
+            .eq('user_id', user_id);
+        
+        if (error) {
+            alert('Erro ao excluir mídia: ' + error.message);
+            return;
+        }
+        
+        alert('Mídia excluída com sucesso!');
+        loadMedia();
+        
+    } catch (err) {
+        console.error('Erro:', err);
+        alert('Erro ao excluir mídia');
+    }
 }
 
-loadMedia();
+// INICIALIZAR
+window.addEventListener('DOMContentLoaded', loadMedia);
 </script>
 
 </body>
