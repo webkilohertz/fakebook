@@ -2,70 +2,160 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>FakeBook - Login</title>
 <style>
-body { margin:0; font-family: Arial, sans-serif; background:#f0f2f5; display:flex; justify-content:center; align-items:center; height:100vh; }
-.login-box { background:white; padding:30px; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,0.2); width:300px; }
-input { width:100%; padding:10px; margin:10px 0; border-radius:6px; border:1px solid #ccc; }
-button { width:100%; padding:10px; border:none; background:#1877f2; color:white; border-radius:6px; cursor:pointer; margin-top:10px; }
-p { font-size:14px; text-align:center; }
-p a { color:#1877f2; text-decoration:none; }
-pre { color: red; font-size: 12px; }
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body { 
+    font-family: Arial, sans-serif; 
+    background: #f0f2f5; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.login-box { 
+    background: white; 
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    width: 400px;
+}
+
+h2 {
+    font-size: 32px;
+    color: #1877f2;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+input { 
+    width: 100%; 
+    padding: 16px;
+    margin: 15px 0; 
+    border-radius: 8px; 
+    border: 2px solid #ddd;
+    font-size: 18px;
+}
+
+input:focus {
+    border-color: #1877f2;
+    outline: none;
+}
+
+button { 
+    width: 100%; 
+    padding: 18px; 
+    border: none; 
+    background: #1877f2; 
+    color: white; 
+    border-radius: 8px; 
+    cursor: pointer; 
+    margin-top: 20px;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+button:hover {
+    background: #166fe5;
+}
+
+p { 
+    font-size: 18px; 
+    text-align: center;
+    margin-top: 20px;
+}
+
+p a { 
+    color: #1877f2; 
+    text-decoration: none;
+    font-weight: bold;
+}
+
+p a:hover {
+    text-decoration: underline;
+}
+
+.error-msg {
+    color: #f02849;
+    font-size: 16px;
+    text-align: center;
+    margin-top: 15px;
+    padding: 10px;
+    background: #ffe6e6;
+    border-radius: 5px;
+    border-left: 4px solid #f02849;
+}
+
+.login-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.login-header h1 {
+    font-size: 40px;
+    color: #1877f2;
+    margin-bottom: 10px;
+}
+
+.login-header p {
+    font-size: 18px;
+    color: #666;
+}
 </style>
 </head>
 <body>
 
 <div class="login-box">
-<h2>Login</h2>
-<input type="text" id="username" placeholder="Usuário ou email">
-<input type="password" id="password" placeholder="Senha">
-<button onclick="login()">Entrar</button>
-<p>Não tem conta? <a href="signup.html">Cadastre-se</a></p>
-<pre id="msg"></pre>
+    <div class="login-header">
+        <h1>FakeBook</h1>
+        <p>Entre na sua conta</p>
+    </div>
+    
+    <input type="text" id="username" placeholder="Usuário ou email">
+    <input type="password" id="password" placeholder="Senha">
+    
+    <button onclick="login()">Entrar</button>
+    
+    <div id="msg" class="error-msg"></div>
+    
+    <p>Não tem conta? <a href="signup.html">Cadastre-se</a></p>
 </div>
 
-<!-- Use a MESMA versão do Supabase -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
-// URLs do seu projeto
 const SUPABASE_URL = "https://umzlriwvexvaabliriva.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtemxyaXd2ZXh2YWFibGlyaXZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ4NjEwMjQsImV4cCI6MjA4MDQzNzAyNH0.8miF7Z0e2sTduJhveCk-6GKzroS0CYF-PS6BZeEKpEI";
 
-// Inicializa o Supabase - FORMA CORRETA
 let supabase;
 
 function initSupabase() {
     try {
-        console.log('Inicializando Supabase...');
-        
-        // Forma 1: Verificar se a biblioteca está carregada
         if (typeof window.supabase !== 'undefined') {
             supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-            console.log('✅ Supabase inicializado!');
-            return true;
-        }
-        // Forma 2: Tentar forma alternativa
-        else if (typeof Supabase !== 'undefined') {
-            supabase = Supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-            console.log('✅ Supabase inicializado (forma alternativa)!');
+            console.log('Supabase OK');
             return true;
         } else {
-            console.error('❌ Supabase não encontrado');
+            console.error('Supabase não carregou');
             return false;
         }
     } catch (error) {
-        console.error('Erro ao inicializar Supabase:', error);
+        console.error('Erro:', error);
         return false;
     }
 }
 
 async function login(){
     try {
-        // Inicializa se não estiver
         if (!supabase) {
-            const success = initSupabase();
-            if (!success) {
-                document.getElementById('msg').innerText = 'Erro: Biblioteca não carregada';
+            if (!initSupabase()) {
+                document.getElementById('msg').innerText = 'Erro de conexão';
                 return;
             }
         }
@@ -74,13 +164,12 @@ async function login(){
         const password = document.getElementById('password').value.trim();
         
         if(!username || !password){ 
-            document.getElementById('msg').innerText='Preencha todos os campos'; 
+            document.getElementById('msg').innerText = 'Preencha todos os campos'; 
             return; 
         }
         
-        console.log('🔍 Buscando usuário:', username);
+        console.log('Tentando login:', username);
         
-        // Procura usuário - CORRIGIDO: usar template literals corretamente
         const { data, error } = await supabase
             .from('users')
             .select('*')
@@ -89,61 +178,35 @@ async function login(){
             .limit(1);
         
         if(error){ 
-            console.error('Erro na busca:', error);
-            document.getElementById('msg').innerText='Erro: '+error.message; 
+            console.error('Erro:', error);
+            document.getElementById('msg').innerText = 'Erro: ' + error.message; 
             return; 
         }
         
         if(!data || data.length===0){ 
-            document.getElementById('msg').innerText='Usuário ou senha incorretos'; 
+            document.getElementById('msg').innerText = 'Usuário ou senha incorretos'; 
             return; 
         }
         
-        console.log('✅ Login bem-sucedido:', data[0].username);
+        console.log('Login OK:', data[0].username);
         
-        // Salva dados do usuário
         localStorage.setItem('user_id', data[0].id);
         localStorage.setItem('user_name', data[0].username);
         localStorage.setItem('user_email', data[0].email);
         
-        // Redireciona
         window.location.href = 'index.html';
         
     } catch(err) {
-        console.error('Erro inesperado:', err);
+        console.error('Erro:', err);
         document.getElementById('msg').innerText = 'Erro: ' + err.message;
     }
 }
 
-// Inicializa quando a página carrega
 window.addEventListener('DOMContentLoaded', () => {
-    console.log('Página de login carregada');
+    console.log('Página carregada');
     initSupabase();
-    
-    // Testa a conexão
-    testConnection();
 });
 
-// Função para testar conexão
-async function testConnection() {
-    if (!supabase) return;
-    
-    try {
-        const { data, error } = await supabase
-            .from('users')
-            .select('count', { count: 'exact', head: true });
-            
-        if (error) {
-            console.log('⚠️ Teste falhou:', error.message);
-        } else {
-            console.log('✅ Conexão OK');
-        }
-    } catch (error) {
-        console.log('⚠️ Não foi possível testar');
-    }
-}
-
-// Permite login com Enter
 document.addEventListener('keypress', function(e) {
     if (e.key === 'Enter') {
         login();
