@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FakeBook - Login</title>
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body { 
+    font-family: Arial, sans-serif; 
+    background: #f0f2f5; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    position: relative;
+}
+
+/* BARRA DE NAVEGAÇÃO SUPERIOR */
+nav {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    background:#fff;
+    padding:15px;
+    text-align:center;
+    box-shadow:0 2px 4px rgba(0,0,0,0.1);
+    z-index: 1000;
+}
+
+nav a {
+    margin:0 15px;
+    color:#1877f2;
+    text-decoration:none;
+    font-size:16px;
+    font-weight:500;
+}
+
+nav a:hover {
+    text-decoration: underline;
+}
+
+/* LINKS DA DIREITA - PRIMEIRA COLUNA */
+.right-links-1 {
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    width: 150px;
+    z-index: 999;
+}
+
+/* LINKS DA DIREITA - SEGUNDA COLUNA */
+.right-links-2 {
+    position: fixed;
+    top: 220px;
+    right: 20px;
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    width: 150px;
+    z-index: 999;
+}
+
+.right-links-1 a,
+.right-links-2 a {
+    display: block;
+    margin: 8px 0;
+    color: #1877f2;
+    text-decoration: none;
+    font-size: 14px;
+    padding: 5px;
+    border-radius: 4px;
+}
+
+.right-links-1 a:hover,
+.right-links-2 a:hover {
+    background: #f0f2f5;
+    text-decoration: none;
+}
+
+/* BOX DE LOGIN */
+.login-box { 
+    background: white; 
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    width: 400px;
+    z-index: 100;
+    position: relative;
+}
+
+h2 {
+    font-size: 32px;
+    color: #1877f2;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+input { 
+    width: 100%; 
+    padding: 16px;
+    margin: 15px 0; 
+    border-radius: 8px; 
+    border: 2px solid #ddd;
+    font-size: 18px;
+}
+
+input:focus {
+    border-color: #1877f2;
+    outline: none;
+}
+
+button { 
+    width: 100%; 
+    padding: 18px; 
+    border: none; 
+    background: #1877f2; 
+    color: white; 
+    border-radius: 8px; 
+    cursor: pointer; 
+    margin-top: 20px;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+button:hover {
+    background: #166fe5;
+}
+
+p { 
+    font-size: 18px; 
+    text-align: center;
+    margin-top: 20px;
+}
+
+p a { 
+    color: #1877f2; 
+    text-decoration: none;
+    font-weight: bold;
+}
+
+p a:hover {
+    text-decoration: underline;
+}
+
+.error-msg {
+    color: #f02849;
+    font-size: 16px;
+    text-align: center;
+    margin-top: 15px;
+    padding: 10px;
+    background: #ffe6e6;
+    border-radius: 5px;
+    border-left: 4px solid #f02849;
+}
+
+.login-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.login-header h1 {
+    font-size: 40px;
+    color: #1877f2;
+    margin-bottom: 10px;
+}
+
+.login-header p {
+    font-size: 18px;
+    color: #666;
+}
+</style>
+</head>
+<body>
+
+<!-- BARRA DE NAVEGAÇÃO SUPERIOR -->
+<nav>
+    <a href="feed.html">Feed</a>
+    <a href="profile.html">Perfil</a>
+    <a href="friends.html">Amigos</a>
+    <a href="groups.html">Grupos</a>
+    <a href="pages.html">Páginas</a>
+    <a href="media.html">Mídia</a>
+    <a href="stories.html">Stories</a>
+    <a href="settings.html">Configurações</a>
+    <a href="login.html">Logout</a>
+</nav>
+
+<!-- PRIMEIRA COLUNA DE LINKS À DIREITA -->
+<div class="right-links-1">
+    <a href="feedzap.html">Compartilhar</a>
+    <a href="profile.html">Perfil</a>
+    <a href="friends.html">Amigos</a>
+    <a href="login.html">Login</a>
+</div>
+
+<!-- SEGUNDA COLUNA DE LINKS À DIREITA -->
+<div class="right-links-2">
+    <a href="feeds.html">Comentários</a>
+    <a href="feed1.html">News</a>
+    <a href="feedzap.html">FeedZap</a>
+    <a href="feed3.html">Lar</a>
+    <a href="loginblock.html">Logon</a>
+    <a href="messages.html">Messages</a>
+    <a href="notifications.html">Notificações</a>
+    <a href="signup.html">Signup</a>
+    <a href="groups.html">GroupS</a>
+</div>
+
+<!-- BOX DE LOGIN CENTRAL -->
+<div class="login-box">
+    <div class="login-header">
+        <h1>FakeBook</h1>
+        <p>Entre na sua conta</p>
+    </div>
+    
+    <input type="text" id="username" placeholder="Usuário ou email">
+    <input type="password" id="password" placeholder="Senha">
+    
+    <button onclick="login()">Entrar</button>
+    
+    <div id="msg" class="error-msg"></div>
+    
+    <p>Não tem conta? <a href="signup.html">Cadastre-se</a></p>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+const SUPABASE_URL = "https://umzlriwvexvaabliriva.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtemxyaXd2ZXh2YWFibGlyaXZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ4NjEwMjQsImV4cCI6MjA4MDQzNzAyNH0.8miF7Z0e2sTduJhveCk-6GKzroS0CYF-PS6BZeEKpEI";
+
+let supabase;
+
+function initSupabase() {
+    try {
+        if (typeof window.supabase !== 'undefined') {
+            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            console.log('Supabase OK');
+            return true;
+        } else {
+            console.error('Supabase não carregou');
+            return false;
+        }
+    } catch (error) {
+        console.error('Erro:', error);
+        return false;
+    }
+}
+
+async function login(){
+    try {
+        if (!supabase) {
+            if (!initSupabase()) {
+                document.getElementById('msg').innerText = 'Erro de conexão';
+                return;
+            }
+        }
+
+        const username = document.getElementById('username').value.trim();
+        const password = document.getElementById('password').value.trim();
+        
+        if(!username || !password){ 
+            document.getElementById('msg').innerText = 'Preencha todos os campos'; 
+            return; 
+        }
+        
+        console.log('Tentando login:', username);
+        
+        const { data, error } = await supabase
+            .from('users')
+            .select('*')
+            .or(`username.eq.${username},email.eq.${username}`)
+            .eq('senha_hash', password)
+            .limit(1);
+        
+        if(error){ 
+            console.error('Erro:', error);
+            document.getElementById('msg').innerText = 'Erro: ' + error.message; 
+            return; 
+        }
+        
+        if(!data || data.length===0){ 
+            document.getElementById('msg').innerText = 'Usuário ou senha incorretos'; 
+            return; 
+        }
+        
+        console.log('Login OK:', data[0].username);
+        
+        localStorage.setItem('user_id', data[0].id);
+        localStorage.setItem('user_name', data[0].username);
+        localStorage.setItem('user_email', data[0].email);
+        
+        window.location.href = 'index.html';
+        
+    } catch(err) {
+        console.error('Erro:', err);
+        document.getElementById('msg').innerText = 'Erro: ' + err.message;
+    }
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+    console.log('Página carregada');
+    initSupabase();
+});
+
+document.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        login();
+    }
+});
+</script>
+
+</body>
+</html>
