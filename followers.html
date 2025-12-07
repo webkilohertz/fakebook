@@ -2,83 +2,526 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>FakeBook - Seguidores</title>
 <style>
-body { margin:0; font-family: Arial, sans-serif; background:#f0f2f5; }
-header { background:#1877f2; color:white; padding:10px 20px; font-size:24px; }
-.container { max-width:600px; margin:20px auto; background:white; padding:20px; border-radius:10px; }
-.user { display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid #ccc; }
-button { padding:5px 10px; border:none; border-radius:5px; cursor:pointer; }
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body { 
+    font-family: Arial, sans-serif; 
+    background: #f0f2f5; 
+    color: #333;
+    font-size: 18px;
+}
+
+header { 
+    background: #1877f2; 
+    color: white; 
+    padding: 20px; 
+    font-size: 28px;
+    text-align: center;
+}
+
+nav {
+    background: white; 
+    padding: 15px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+nav a {
+    margin: 0 15px;
+    color: #1877f2;
+    text-decoration: none;
+    font-size: 18px;
+    font-weight: 500;
+    padding: 8px 12px;
+    border-radius: 6px;
+    transition: background 0.3s;
+}
+
+nav a:hover {
+    background: #f0f2f5;
+}
+
+.container {
+    max-width: 700px;
+    margin: 30px auto;
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+h2 {
+    font-size: 24px;
+    color: #1877f2;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #f0f2f5;
+}
+
+.follow-section {
+    margin-bottom: 30px;
+}
+
+.user-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin: 20px 0;
+}
+
+.user-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    border: 1px solid #e4e6eb;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.user-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: #1877f2;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.user-details {
+    flex: 1;
+}
+
+.user-name {
+    font-weight: bold;
+    font-size: 18px;
+    color: #1877f2;
+}
+
+.user-username {
+    color: #65676b;
+    font-size: 16px;
+}
+
+.user-date {
+    font-size: 14px;
+    color: #8a8d91;
+}
+
+button {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+    transition: all 0.3s;
+}
+
+.btn-follow {
+    background: #1877f2;
+    color: white;
+}
+
+.btn-follow:hover {
+    background: #166fe5;
+}
+
+.btn-unfollow {
+    background: #f02849;
+    color: white;
+}
+
+.btn-unfollow:hover {
+    background: #e02445;
+}
+
+.add-follower {
+    display: flex;
+    gap: 10px;
+    margin: 20px 0;
+}
+
+.add-follower input {
+    flex: 1;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    font-size: 18px;
+}
+
+.add-follower button {
+    padding: 15px 25px;
+}
+
+.empty-message {
+    text-align: center;
+    padding: 40px;
+    color: #666;
+    font-size: 18px;
+}
+
+.follower-stats {
+    display: flex;
+    gap: 30px;
+    margin: 25px 0;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 10px;
+}
+
+.stat-item {
+    text-align: center;
+    flex: 1;
+}
+
+.stat-value {
+    font-size: 32px;
+    font-weight: bold;
+    color: #1877f2;
+}
+
+.stat-label {
+    font-size: 16px;
+    color: #65676b;
+    margin-top: 5px;
+}
 </style>
 </head>
 <body>
 
-<header>FakeBook - Seguidores / Seguindo</header>
+<header>FakeBook - Seguidores</header>
+<nav>
+  <a href="feed.html">Feed</a>
+  <a href="profile.html">Perfil</a>
+  <a href="friends.html">Amigos</a>
+  <a href="groups.html">Grupos</a>
+  <a href="pages.html">Páginas</a>
+  <a href="media.html">Mídia</a>
+  <a href="stories.html">Stories</a>
+  <a href="settings.html">Configurações</a>
+  <a href="login.html">Logout</a>
+</nav>
 
 <div class="container">
-<h2>Seguidores</h2>
-<div id="followers-list"></div>
-
-<h2>Seguindo</h2>
-<div id="following-list"></div>
-
-<h2>Seguir Usuário</h2>
-<input type="text" id="usernameToFollow" placeholder="Nome de usuário">
-<button onclick="followUser()">Seguir</button>
+    <!-- ESTATÍSTICAS -->
+    <div class="follower-stats">
+        <div class="stat-item">
+            <div class="stat-value" id="followers-count">0</div>
+            <div class="stat-label">Seguidores</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-value" id="following-count">0</div>
+            <div class="stat-label">Seguindo</div>
+        </div>
+    </div>
+    
+    <!-- ADICIONAR SEGUIDOR -->
+    <div class="follow-section">
+        <h2>➕ Seguir Usuário</h2>
+        <div class="add-follower">
+            <input type="text" id="usernameToFollow" placeholder="Digite o nome de usuário">
+            <button onclick="followUser()" class="btn-follow">Seguir</button>
+        </div>
+    </div>
+    
+    <!-- SEGUIDORES -->
+    <div class="follow-section">
+        <h2>👥 Seus Seguidores</h2>
+        <div id="followers-list" class="user-list">
+            <div class="empty-message">Carregando seguidores...</div>
+        </div>
+    </div>
+    
+    <!-- SEGUINDO -->
+    <div class="follow-section">
+        <h2>👣 Quem Você Segue</h2>
+        <div id="following-list" class="user-list">
+            <div class="empty-message">Carregando...</div>
+        </div>
+    </div>
 </div>
 
-<script src="https://unpkg.com/@supabase/supabase-js/umd/supabase.js"></script>
+<!-- MESMO CDN -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
-const supabaseUrl = "https://umzlriwvexvaabliriva.supabase.co";
-const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtemxyaXd2ZXh2YWFibGlyaXZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ4NjEwMjQsImV4cCI6MjA4MDQzNzAyNH0.8miF7Z0e2sTduJhveCk-6GKzroS0CYF-PS6BZeEKpEI";
-const supabase = Supabase.createClient(supabaseUrl, supabaseKey);
+const SUPABASE_URL = "https://umzlriwvexvaabliriva.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtemxyaXd2ZXh2YWFibGlyaXZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ4NjEwMjQsImV4cCI6MjA4MDQzNzAyNH0.8miF7Z0e2sTduJhveCk-6GKzroS0CYF-PS6BZeEKpEI";
+
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 const user_id = localStorage.getItem('user_id');
-if(!user_id){ window.location.href='login.html'; }
-
-// Carregar seguidores e seguindo
-async function loadFollowers(){
-    const { data: followers } = await supabase.from('followers').select('follower_id, users(nome,username)').eq('user_id', user_id);
-    const followersDiv = document.getElementById('followers-list');
-    followersDiv.innerHTML='';
-    followers.forEach(f=>{
-        const div = document.createElement('div');
-        div.className='user';
-        div.innerHTML = `<span>${f.users.nome} (@${f.users.username})</span>`;
-        followersDiv.appendChild(div);
-    });
-
-    const { data: following } = await supabase.from('followers').select('user_id, users(nome,username)').eq('follower_id', user_id);
-    const followingDiv = document.getElementById('following-list');
-    followingDiv.innerHTML='';
-    following.forEach(f=>{
-        const div = document.createElement('div');
-        div.className='user';
-        div.innerHTML = `<span>${f.users.nome} (@${f.users.username})</span>
-        <button onclick="unfollow(${f.user_id})">Deixar de seguir</button>`;
-        followingDiv.appendChild(div);
-    });
+if(!user_id) { 
+    alert('Faça login primeiro!');
+    window.location.href = 'login.html'; 
 }
 
-// Seguir usuário
-async function followUser(){
+// CARREGAR SEGUIDORES
+async function loadFollowers() {
+    try {
+        // SEGUIDORES (quem segue VOCÊ)
+        const { data: followers, error: followersError } = await supabase
+            .from('followers')
+            .select(`
+                id,
+                follower_id,
+                criado_em,
+                users!followers_follower_id_fkey(nome, sobrenome, username)
+            `)
+            .eq('user_id', user_id)  // user_id = você, follower_id = quem te segue
+            .order('criado_em', { ascending: false });
+        
+        // SEGUINDO (quem VOCÊ segue)
+        const { data: following, error: followingError } = await supabase
+            .from('followers')
+            .select(`
+                id,
+                user_id,
+                criado_em,
+                users!followers_user_id_fkey(nome, sobrenome, username)
+            `)
+            .eq('follower_id', user_id)  // follower_id = você, user_id = quem você segue
+            .order('criado_em', { ascending: false });
+        
+        if (followersError || followingError) {
+            console.error('Erro:', followersError || followingError);
+            alert('Erro ao carregar seguidores');
+            return;
+        }
+        
+        // ATUALIZA ESTATÍSTICAS
+        document.getElementById('followers-count').textContent = followers ? followers.length : 0;
+        document.getElementById('following-count').textContent = following ? following.length : 0;
+        
+        // RENDERIZA SEGUIDORES
+        const followersDiv = document.getElementById('followers-list');
+        if (!followers || followers.length === 0) {
+            followersDiv.innerHTML = '<div class="empty-message">Você ainda não tem seguidores</div>';
+        } else {
+            followersDiv.innerHTML = '';
+            followers.forEach(follower => {
+                const userDiv = createUserItem(
+                    follower.users,
+                    'follower',
+                    follower.id,
+                    follower.criado_em
+                );
+                followersDiv.appendChild(userDiv);
+            });
+        }
+        
+        // RENDERIZA SEGUINDO
+        const followingDiv = document.getElementById('following-list');
+        if (!following || following.length === 0) {
+            followingDiv.innerHTML = '<div class="empty-message">Você ainda não segue ninguém</div>';
+        } else {
+            followingDiv.innerHTML = '';
+            following.forEach(follow => {
+                const userDiv = createUserItem(
+                    follow.users,
+                    'following',
+                    follow.user_id,  // ID do usuário que você segue
+                    follow.criado_em
+                );
+                followingDiv.appendChild(userDiv);
+            });
+        }
+        
+    } catch (err) {
+        console.error('Erro:', err);
+        alert('Erro ao carregar seguidores');
+    }
+}
+
+// CRIAR ITEM DE USUÁRIO
+function createUserItem(userData, type, id, createdAt) {
+    const div = document.createElement('div');
+    div.className = 'user-item';
+    
+    const userName = `${userData.nome || ''} ${userData.sobrenome || ''}`.trim() || 
+                     userData.username || 'Usuário';
+    const firstLetter = userName.charAt(0).toUpperCase();
+    const followDate = createdAt ? new Date(createdAt).toLocaleDateString('pt-BR') : '';
+    
+    let actionButton = '';
+    if (type === 'follower') {
+        // Para seguidores, mostra botão para seguir de volta (se ainda não segue)
+        actionButton = `<button class="btn-follow" onclick="followBack(${userData.id})">Seguir de Volta</button>`;
+    } else if (type === 'following') {
+        // Para quem você segue, mostra botão para deixar de seguir
+        actionButton = `<button class="btn-unfollow" onclick="unfollow(${id})">Deixar de Seguir</button>`;
+    }
+    
+    div.innerHTML = `
+        <div class="user-info">
+            <div class="user-avatar">${firstLetter}</div>
+            <div class="user-details">
+                <div class="user-name">${userName}</div>
+                <div class="user-username">@${userData.username || 'semusuario'}</div>
+                <div class="user-date">Desde ${followDate}</div>
+            </div>
+        </div>
+        ${actionButton}
+    `;
+    
+    return div;
+}
+
+// SEGUIR USUÁRIO
+async function followUser() {
     const username = document.getElementById('usernameToFollow').value.trim();
-    if(!username) return alert('Digite o nome de usuário');
-    const { data, error } = await supabase.from('users').select('id').eq('username', username).single();
-    if(!data) return alert('Usuário não encontrado');
-    if(data.id == user_id) return alert('Não pode seguir você mesmo');
-    await supabase.from('followers').insert([{user_id: data.id, follower_id: user_id}]);
-    document.getElementById('usernameToFollow').value='';
-    loadFollowers();
+    
+    if (!username) {
+        alert('Digite o nome de usuário');
+        return;
+    }
+    
+    if (username === localStorage.getItem('user_name')) {
+        alert('Você não pode seguir a si mesmo!');
+        return;
+    }
+    
+    try {
+        // BUSCA O USUÁRIO
+        const { data: userData, error: userError } = await supabase
+            .from('users')
+            .select('id, nome, username')
+            .eq('username', username)
+            .single();
+        
+        if (userError || !userData) {
+            alert('Usuário não encontrado');
+            return;
+        }
+        
+        const userToFollowId = userData.id;
+        
+        // VERIFICA SE JÁ SEGUE
+        const { data: existingFollow } = await supabase
+            .from('followers')
+            .select('id')
+            .eq('user_id', userToFollowId)
+            .eq('follower_id', user_id)
+            .single();
+        
+        if (existingFollow) {
+            alert(`Você já segue ${userData.nome} (@${userData.username})`);
+            return;
+        }
+        
+        // VERIFICA SE É O MESMO USUÁRIO
+        if (userToFollowId == user_id) {
+            alert('Você não pode seguir a si mesmo!');
+            return;
+        }
+        
+        // ADICIONA SEGUIDOR
+        const { error } = await supabase
+            .from('followers')
+            .insert([{
+                user_id: userToFollowId,      // quem você vai seguir
+                follower_id: user_id          // você é o seguidor
+            }]);
+        
+        if (error) {
+            alert('Erro ao seguir usuário: ' + error.message);
+            return;
+        }
+        
+        alert(`Agora você segue ${userData.nome} (@${userData.username})!`);
+        document.getElementById('usernameToFollow').value = '';
+        loadFollowers();
+        
+    } catch (err) {
+        console.error('Erro:', err);
+        alert('Erro ao seguir usuário');
+    }
 }
 
-// Deixar de seguir
-async function unfollow(id){
-    await supabase.from('followers').delete().eq('user_id', id).eq('follower_id', user_id);
-    loadFollowers();
+// SEGUIR DE VOLTA
+async function followBack(followerId) {
+    try {
+        // VERIFICA SE JÁ SEGUE
+        const { data: existingFollow } = await supabase
+            .from('followers')
+            .select('id')
+            .eq('user_id', followerId)
+            .eq('follower_id', user_id)
+            .single();
+        
+        if (existingFollow) {
+            alert('Você já segue este usuário');
+            return;
+        }
+        
+        // SEGUE DE VOLTA
+        const { error } = await supabase
+            .from('followers')
+            .insert([{
+                user_id: followerId,      // quem você vai seguir
+                follower_id: user_id      // você é o seguidor
+            }]);
+        
+        if (error) {
+            alert('Erro ao seguir de volta: ' + error.message);
+            return;
+        }
+        
+        alert('Agora vocês se seguem mutuamente!');
+        loadFollowers();
+        
+    } catch (err) {
+        console.error('Erro:', err);
+        alert('Erro ao seguir de volta');
+    }
 }
 
-loadFollowers();
+// DEIXAR DE SEGUIR
+async function unfollow(userId) {
+    if (!confirm('Tem certeza que deseja deixar de seguir este usuário?')) {
+        return;
+    }
+    
+    try {
+        const { error } = await supabase
+            .from('followers')
+            .delete()
+            .eq('user_id', userId)
+            .eq('follower_id', user_id);
+        
+        if (error) {
+            alert('Erro ao deixar de seguir: ' + error.message);
+            return;
+        }
+        
+        alert('Você deixou de seguir este usuário');
+        loadFollowers();
+        
+    } catch (err) {
+        console.error('Erro:', err);
+        alert('Erro ao deixar de seguir');
+    }
+}
+
+// INICIALIZAR
+window.addEventListener('DOMContentLoaded', loadFollowers);
 </script>
 
 </body>
