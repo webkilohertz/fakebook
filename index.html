@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>FakeBook - Feed</title>
+<style>
+body { margin:0; font-family: Arial, sans-serif; background:#f0f2f5; }
+header { background:#1877f2; color:white; padding:15px; text-align:center; font-size:24px; }
+nav { background:white; padding:10px; text-align:center; }
+nav a { margin:0 10px; color:#1877f2; text-decoration:none; }
+.container { max-width:600px; margin:20px auto; padding:0 15px; }
+.post { background:white; padding:15px; border-radius:8px; margin-bottom:15px; }
+.post-content { margin:10px 0; }
+.post-media { max-width:100%; border-radius:5px; margin-top:10px; }
+.post-actions { margin-top:10px; }
+.post-actions button { padding:5px 10px; margin-right:5px; border:none; border-radius:5px; cursor:pointer; }
+</style>
+</head>
+<body>
+
+<header>FakeBook</header>
+<nav>
+  <a href="feed.html">Feed</a>
+  <a href="profile.html">Perfil</a>
+  <a href="friends.html">Amigos</a>
+  <a href="login.html">Logout</a>
+</nav>
+
+<div class="container">
+    <h2>Todos os Posts</h2>
+    <div id="posts"></div>
+</div>
+
+<script src="https://unpkg.com/@supabase/supabase-js/umd/supabase.js"></script>
+<script>
+const supabaseUrl = "https://umzlriwvexvaabliriva.supabase.co";
+const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtemxyaXd2ZXh2YWFibGlyaXZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ4NjEwMjQsImV4cCI6MjA4MDQzNzAyNH0.8miF7Z0e2sTduJhveCk-6GKzroS0CYF-PS6BZeEKpEI";
+
+const supabase = Supabase.createClient(supabaseUrl, supabaseKey);
+
+async function loadPosts() {
+    const container = document.getElementById('posts');
+    container.innerHTML = '<p>Carregando posts...</p>';
+
+    // Puxa TODOS os posts de TODOS os usuários
+    const { data, error } = await supabase
+        .from('posts')
+        .select('*')
+        .order('criado_em', { ascending: false });
+
+    if (error) {
+        container.innerHTML = '<p>Erro: ' + error.message + '</p>';
+        return;
+    }
+
+    if (!data || data.length === 0) {
+        container.innerHTML = '<p>Nenhum post encontrado</p>';
+        return;
+    }
+
+    container.innerHTML = '';
+
+    data.forEach(post => {
+        const postDiv = document.createElement('div');
+        postDiv.className = 'post';
+        
+        const postDate = new Date(post.criado_em).toLocaleString('pt-BR');
+        
+        let mediaHtml = '';
+        if (post.midia_url) {
+            mediaHtml = `<img src="${post.midia_url}" class="post-media">`;
+        }
+        
+        postDiv.innerHTML = `
+            <div><strong>Post #${post.id}</strong> <small>${postDate}</small></div>
+            <div class="post-content">${post.conteudo || ''}</div>
+            ${mediaHtml}
+            <div class="post-actions">
+                <button onclick="likePost(${post.id})">Curtir</button>
+                <button onclick="shareToWhatsapp(${post.id})">Compartilhar no Zap</button>
+            </div>
+        `;
+        
+        container.appendChild(postDiv);
+    });
+}
+
+async function likePost(postId) {
+    const user_id = localStorage.getItem('user_id');
+    if (!user_id) {
+        alert('Faça login para curtir!');
+        window.location.href = 'login.html';
+        return;
+    }
+    
+    await supabase.from('post_likes').insert([{
+        post_id: postId,
+        user_id: user_id,
+        tipo: 'curtir'
+    }]);
+    
+    alert('Post curtido!');
+}
+
+function shareToWhatsapp(postId) {
+    const postUrl = window.location.href;
+    const whatsappUrl = `https://wa.me/?text=Confira este post: ${postUrl}`;
+    window.open(whatsappUrl, '_blank');
+}
+
+window.addEventListener('DOMContentLoaded', loadPosts);
+</script>
+
+</body>
+</html>
