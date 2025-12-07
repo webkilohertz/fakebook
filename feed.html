@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FakeBook - Feed</title>
+<style>
+body { margin:0; font-family: Arial, sans-serif; background:#f0f2f5; }
+header { background:#1877f2; color:white; padding:20px; font-size:24px; text-align:center; }
+nav { background:white; padding:15px; text-align:center; box-shadow:0 2px 4px rgba(0,0,0,0.1); }
+nav a { margin:0 10px; color:#1877f2; text-decoration:none; font-weight:500; }
+.container { max-width:600px; margin:20px auto; padding:0 20px; }
+.post-form { background:white; padding:20px; border-radius:10px; margin-bottom:20px; }
+.post-form textarea, .post-form input, .post-form select { width:100%; padding:12px; margin:8px 0; border-radius:8px; border:1px solid #ccc; font-size:16px; }
+.post-form button { background:#1877f2; color:white; border:none; padding:12px 20px; border-radius:8px; cursor:pointer; font-size:16px; }
+.post { background:white; padding:20px; border-radius:10px; margin-bottom:20px; }
+.post-author { font-weight:bold; color:#1877f2; margin-bottom:5px; }
+.post-content { margin:15px 0; font-size:16px; }
+.post-media { max-width:100%; border-radius:8px; margin-top:10px; }
+.post-actions { margin-top:15px; padding-top:15px; border-top:1px solid #eee; }
+.post-actions button { padding:8px 15px; margin-right:10px; border:none; border-radius:5px; cursor:pointer; }
+</style>
+</head>
+<body>
+
+<header>FakeBook
+<nav>
+  <a href="feed.html">Feed</a>
+  <a href="profile.html">Perfil</a>
+  <a href="friends.html">Amigos</a>
+  <a href="login.html">Logout</a>
+</nav>
+</header>
+
+<div class="container">
+    <div class="post-form">
+        <h3>Novo Post</h3>
+        <textarea id="post-content" placeholder="No que você está pensando?" rows="3"></textarea>
+        <input type="text" id="post-media" placeholder="URL de mídia (opcional)">
+        <select id="post-type">
+            <option value="texto">Texto</option>
+            <option value="imagem">Imagem</option>
+            <option value="video">Vídeo</option>
+        </select>
+        <select id="post-privacy">
+            <option value="publico">Público</option>
+            <option value="amigos">Amigos</option>
+            <option value="privado">Privado</option>
+        </select>
+        <button onclick="createPost()">Postar</button>
+    </div>
+
+    <h3>Feed</h3>
+    <div id="feed"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+const SUPABASE_URL = "https://umzlriwvexvaabliriva.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtemxyaXd2ZXh2YWFibGlyaXZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ4NjEwMjQsImV4cCI6MjA4MDQzNzAyNH0.8miF7Z0e2sTduJhveCk-6GKzroS0CYF-PS6BZeEKpEI";
+
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// Verifica login
+const user_id = localStorage.getItem('user_id');
+if(!user_id) { 
+    alert('Faça login primeiro!');
+    window.location.href = 'login.html'; 
+}
+
+// Criar post
+async function createPost(){
+    const conteudo = document.getElementById('post-content').value.trim();
+    const midia_url = document.getElementById('post-media').value.trim();
+    const tipo = document.getElementById('post-type').value;
+    const privacidade = document.getElementById('post-privacy').value;
+    
+    if(!conteudo && !midia_url) {
+        alert('Digite algo ou insira uma mídia!');
+        return;
+    }
+    
+    try {
+        const { error } = await supabase
+            .from('posts')
+            .insert([{
+                user_id: user_id,
+                conteudo: conteudo,
+                midia_url: midia_url || null,
+                tipo: tipo,
+                privacidade: privacidade,
+                criado_em: new Date().toISOString()
+            }]);
+        
+        if (error) {
+            console.error('Erro ao criar post:', error);
+            alert('Erro ao criar post: ' + error.message);
+            return;
+        }
+        
+        alert('Post criado com sucesso!');
+        document.getElementById('post-content').value = '';
+        document.getElementById('post-media').value = '';
+        loadFeed();
+        
+    } catch (err) {
+        console.error('Erro inesperado:', err);
+        alert('Erro inesperado ao criar post');
+    }
+}
+
+// Carregar feed
+async function loadFeed(){
+    const feed = document.getElementById('feed');
+    feed.innerHTML = '<p>Carregando posts...</p>';
+    
+    try {
+        // Primeiro puxa os posts com informações básicas do usuário
+        const { data: posts, error: postsError } = await supabase
+            .from('posts')
+            .select(`
+                id,
+                conteudo,
+                midia_url,
+                tipo,
+                privacidade,
+                criado_em,
+                user_id,
+                users!left(nome, sobrenome, username)
+            `)
+            .order('criado_em', { ascending: false })
+            .limit(20);
+        
+        if (postsError) {
+            console.error('Erro ao carregar posts:', postsError);
+            feed.innerHTML = '<p>Erro ao carregar posts</p>';
+            return;
+        }
+        
+        if (!posts || posts.length === 0) {
+            feed.innerHTML = '<p>Nenhum post encontrado. Seja o primeiro a postar!</p>';
+            return;
+        }
+        
+        feed.innerHTML = '';
+        
+        // Para cada post, busca likes e comentários separadamente
+        for (const post of posts) {
+            // Busca contagem de likes
+            const { count: likesCount } = await supabase
+                .from('post_likes')
+                .select('id', { count: 'exact', head: true })
+                .eq('post_id', post.id);
+            
+            // Busca contagem de comentários (se tabela comments existir)
+            let commentsCount = 0;
+            try {
+                const { count: comments } = await supabase
+                    .from('comments')
+                    .select('id', { count: 'exact', head: true })
+                    .eq('post_id', post.id);
+                commentsCount = comments || 0;
+            } catch (e) {
+                console.log('Tabela comments não encontrada ou erro:', e.message);
+            }
+            
+            const postDiv = document.createElement('div');
+            postDiv.className = 'post';
+            
+            const userName = post.users ? 
+                `${post.users.nome || ''} ${post.users.sobrenome || ''}`.trim() || 
+                post.users.username || 'Usuário Desconhecido' : 
+                'Usuário Desconhecido';
+            
+            const postDate = new Date(post.criado_em).toLocaleString('pt-BR');
+            
+            let mediaHtml = '';
+            if (post.midia_url) {
+                if (post.tipo === 'imagem') {
+                    mediaHtml = `<img src="${post.midia_url}" alt="Imagem" class="post-media">`;
+                } else if (post.tipo === 'video') {
+                    mediaHtml = `<video src="${post.midia_url}" controls class="post-media"></video>`;
+                } else {
+                    mediaHtml = `<img src="${post.midia_url}" alt="Mídia" class="post-media">`;
+                }
+            }
+            
+            postDiv.innerHTML = `
+                <div class="post-author">
+                    ${userName} 
+                    <small style="color:#666; font-weight:normal;">• ${postDate}</small>
+                </div>
+                <div class="post-content">${post.conteudo || ''}</div>
+                ${mediaHtml}
+                <div class="post-actions">
+                    <button onclick="likePost(${post.id})">👍 Curtir (${likesCount || 0})</button>
+                    <button onclick="addComment(${post.id})">💬 Comentar (${commentsCount})</button>
+                    <textarea id="comment-${post.id}" placeholder="Comente..." style="width:100%; margin-top:10px; display:none;"></textarea>
+                </div>
+            `;
+            
+            feed.appendChild(postDiv);
+        }
+        
+    } catch (err) {
+        console.error('Erro inesperado:', err);
+        feed.innerHTML = '<p>Erro inesperado ao carregar feed</p>';
+    }
+}
+
+// Curtir post
+async function likePost(post_id){
+    try {
+        // Verifica se já curtiu
+        const { data: existingLike } = await supabase
+            .from('post_likes')
+            .select('id')
+            .eq('post_id', post_id)
+            .eq('user_id', user_id)
+            .single();
+        
+        if (existingLike) {
+            // Remove like
+            const { error } = await supabase
+                .from('post_likes')
+                .delete()
+                .eq('id', existingLike.id);
+            
+            if (!error) {
+                alert('Like removido!');
+                loadFeed();
+            }
+        } else {
+            // Adiciona like
+            const { error } = await supabase
+                .from('post_likes')
+                .insert([{
+                    post_id: post_id,
+                    user_id: user_id,
+                    tipo: 'curtir'
+                }]);
+            
+            if (!error) {
+                alert('Post curtido!');
+                loadFeed();
+            }
+        }
+    } catch (err) {
+        console.error('Erro ao curtir:', err);
+        alert('Erro ao curtir post');
+    }
+}
+
+// Adicionar comentário
+async function addComment(post_id){
+    // Mostra/oculta textarea
+    const textarea = document.getElementById(`comment-${post_id}`);
+    if (textarea.style.display === 'none' || !textarea.style.display) {
+        textarea.style.display = 'block';
+        return;
+    }
+    
+    const content = textarea.value.trim();
+    if(!content) {
+        alert('Digite um comentário!');
+        return;
+    }
+    
+    try {
+        // Tenta inserir na tabela comments
+        const { error } = await supabase
+            .from('comments')
+            .insert([{
+                post_id: post_id,
+                user_id: user_id,
+                conteudo: content,
+                criado_em: new Date().toISOString()
+            }]);
+        
+        if (error) {
+            console.error('Erro ao comentar:', error);
+            alert('Erro ao adicionar comentário: ' + error.message);
+            return;
+        }
+        
+        alert('Comentário adicionado!');
+        textarea.value = '';
+        textarea.style.display = 'none';
+        loadFeed();
+        
+    } catch (err) {
+        console.error('Erro inesperado:', err);
+        alert('Erro ao adicionar comentário');
+    }
+}
+
+// Carrega o feed quando a página abrir
+window.addEventListener('DOMContentLoaded', loadFeed);
+</script>
+
+</body>
+</html>
