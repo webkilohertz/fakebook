@@ -2,112 +2,676 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>FakeBook - Amigos</title>
 <style>
-body { margin:0; font-family: Arial, sans-serif; background:#f0f2f5; }
-header { background:#1877f2; color:white; padding:10px 20px; font-size:24px; }
-.container { max-width:600px; margin:20px auto; background:white; padding:20px; border-radius:10px; }
-.friend { display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid #ccc; }
-button { padding:5px 10px; border:none; border-radius:5px; cursor:pointer; }
-input { width:70%; padding:5px; margin-right:5px; border-radius:5px; border:1px solid #ccc; }
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body { 
+    font-family: Arial, sans-serif; 
+    background: #f0f2f5; 
+    color: #333;
+    font-size: 18px;
+}
+
+header { 
+    background: #1877f2; 
+    color: white; 
+    padding: 20px; 
+    font-size: 28px;
+    text-align: center;
+}
+
+nav {
+    background: white; 
+    padding: 15px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+nav a {
+    margin: 0 15px;
+    color: #1877f2;
+    text-decoration: none;
+    font-size: 18px;
+    font-weight: 500;
+    padding: 8px 12px;
+    border-radius: 6px;
+    transition: background 0.3s;
+}
+
+nav a:hover {
+    background: #f0f2f5;
+}
+
+.container {
+    max-width: 800px;
+    margin: 30px auto;
+    padding: 0 20px;
+}
+
+.section {
+    background: white;
+    padding: 25px;
+    border-radius: 15px;
+    margin-bottom: 25px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+h2 {
+    font-size: 24px;
+    color: #1877f2;
+    margin-bottom: 20px;
+}
+
+.add-friend {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.add-friend input {
+    flex: 1;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    font-size: 18px;
+}
+
+.add-friend button {
+    padding: 15px 25px;
+    border: none;
+    border-radius: 8px;
+    background: #1877f2;
+    color: white;
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: 500;
+}
+
+.add-friend button:hover {
+    background: #166fe5;
+}
+
+.friend-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.friend-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    border: 1px solid #e4e6eb;
+}
+
+.friend-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.friend-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: #1877f2;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.friend-details {
+    flex: 1;
+}
+
+.friend-name {
+    font-weight: bold;
+    font-size: 18px;
+    color: #1877f2;
+}
+
+.friend-username {
+    color: #65676b;
+    font-size: 16px;
+}
+
+.friend-status {
+    font-size: 14px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-weight: 500;
+}
+
+.status-pending {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.status-accepted {
+    background: #d4edda;
+    color: #155724;
+}
+
+.friend-actions {
+    display: flex;
+    gap: 10px;
+}
+
+button {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+    transition: all 0.3s;
+}
+
+.btn-accept {
+    background: #42b72a;
+    color: white;
+}
+
+.btn-accept:hover {
+    background: #36a420;
+}
+
+.btn-reject {
+    background: #f02849;
+    color: white;
+}
+
+.btn-reject:hover {
+    background: #e02445;
+}
+
+.btn-remove {
+    background: #dc3545;
+    color: white;
+}
+
+.btn-remove:hover {
+    background: #c82333;
+}
+
+.btn-cancel {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-cancel:hover {
+    background: #5a6268;
+}
+
+.empty-message {
+    text-align: center;
+    padding: 40px;
+    color: #666;
+    font-size: 18px;
+}
+
+.friend-stats {
+    display: flex;
+    gap: 20px;
+    margin: 20px 0;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 10px;
+}
+
+.stat-item {
+    text-align: center;
+    flex: 1;
+}
+
+.stat-value {
+    font-size: 28px;
+    font-weight: bold;
+    color: #1877f2;
+}
+
+.stat-label {
+    font-size: 14px;
+    color: #65676b;
+    margin-top: 5px;
+}
 </style>
 </head>
 <body>
 
 <header>FakeBook - Amigos</header>
-<nav style="background:#fff;padding:10px;text-align:center;box-shadow:0 2px 4px rgba(0,0,0,0.1);">
-  <a href="feed.html" style="margin:0 10px;">Feed</a>
-  <a href="profile.html" style="margin:0 10px;">Perfil</a>
-  <a href="friends.html" style="margin:0 10px;">Amigos</a>
-  <a href="groups.html" style="margin:0 10px;">Grupos</a>
-  <a href="pages.html" style="margin:0 10px;">Páginas</a>
-  <a href="media.html" style="margin:0 10px;">Mídia</a>
-  <a href="stories.html" style="margin:0 10px;">Stories</a>
-  <a href="settings.html" style="margin:0 10px;">Configurações</a>
-  <a href="login.html" style="margin:0 10px;">Logout</a>
+<nav>
+  <a href="feed.html">Feed</a>
+  <a href="profile.html">Perfil</a>
+  <a href="friends.html">Amigos</a>
+  <a href="groups.html">Grupos</a>
+  <a href="pages.html">Páginas</a>
+  <a href="media.html">Mídia</a>
+  <a href="stories.html">Stories</a>
+  <a href="settings.html">Configurações</a>
+  <a href="login.html">Logout</a>
 </nav>
 
-    
 <div class="container">
-<h2>Adicionar Amigo</h2>
-<input type="text" id="friendUsername" placeholder="Nome de usuário">
-<button onclick="addFriend()">Adicionar</button>
-
-<h2>Solicitações Pendentes</h2>
-<div id="pending-friends"></div>
-
-<h2>Seus Amigos</h2>
-<div id="friends-list"></div>
+    <!-- ADICIONAR AMIGO -->
+    <div class="section">
+        <h2>👥 Adicionar Amigo</h2>
+        <div class="add-friend">
+            <input type="text" id="friendUsername" placeholder="Digite o nome de usuário">
+            <button onclick="addFriend()">Enviar Solicitação</button>
+        </div>
+    </div>
+    
+    <!-- ESTATÍSTICAS -->
+    <div class="section">
+        <div class="friend-stats">
+            <div class="stat-item">
+                <div class="stat-value" id="friends-count">0</div>
+                <div class="stat-label">Amigos</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="pending-count">0</div>
+                <div class="stat-label">Solicitações Pendentes</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="sent-count">0</div>
+                <div class="stat-label">Solicitações Enviadas</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- SOLICITAÇÕES PENDENTES -->
+    <div class="section">
+        <h2>📨 Solicitações Pendentes</h2>
+        <div id="pending-friends" class="friend-list">
+            <div class="empty-message">Carregando solicitações...</div>
+        </div>
+    </div>
+    
+    <!-- SEUS AMIGOS -->
+    <div class="section">
+        <h2>🤝 Seus Amigos</h2>
+        <div id="friends-list" class="friend-list">
+            <div class="empty-message">Carregando amigos...</div>
+        </div>
+    </div>
+    
+    <!-- SOLICITAÇÕES ENVIADAS -->
+    <div class="section">
+        <h2>📤 Solicitações Enviadas</h2>
+        <div id="sent-requests" class="friend-list">
+            <div class="empty-message">Carregando solicitações enviadas...</div>
+        </div>
+    </div>
 </div>
 
-<script src="https://unpkg.com/@supabase/supabase-js/umd/supabase.js"></script>
+<!-- MESMO CDN -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
-const supabaseUrl = "https://umzlriwvexvaabliriva.supabase.co";
-const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtemxyaXd2ZXh2YWFibGlyaXZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ4NjEwMjQsImV4cCI6MjA4MDQzNzAyNH0.8miF7Z0e2sTduJhveCk-6GKzroS0CYF-PS6BZeEKpEI";
-const supabase = Supabase.createClient(supabaseUrl, supabaseKey);
+const SUPABASE_URL = "https://umzlriwvexvaabliriva.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtemxyaXd2ZXh2YWFibGlyaXZhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ4NjEwMjQsImV4cCI6MjA4MDQzNzAyNH0.8miF7Z0e2sTduJhveCk-6GKzroS0CYF-PS6BZeEKpEI";
+
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 const user_id = localStorage.getItem('user_id');
-if(!user_id){ window.location.href='login.html'; }
+if(!user_id) { 
+    alert('Faça login primeiro!');
+    window.location.href = 'login.html'; 
+}
 
-// Adicionar amigo
-async function addFriend(){
+// ADICIONAR AMIGO
+async function addFriend() {
     const username = document.getElementById('friendUsername').value.trim();
-    if(!username) return alert('Digite o nome de usuário');
-    const { data, error } = await supabase.from('users').select('id').eq('username', username).single();
-    if(error || !data) return alert('Usuário não encontrado');
-    const { error: e } = await supabase.from('friends').insert([{user_id, friend_id: data.id, status:'pendente'}]);
-    if(e) alert('Erro ao enviar solicitação'); else { alert('Solicitação enviada!'); loadFriends(); }
+    
+    if (!username) {
+        alert('Digite o nome de usuário');
+        return;
+    }
+    
+    if (username === localStorage.getItem('user_name')) {
+        alert('Você não pode adicionar a si mesmo!');
+        return;
+    }
+    
+    try {
+        // BUSCA O USUÁRIO
+        const { data: userData, error: userError } = await supabase
+            .from('users')
+            .select('id, nome, username')
+            .eq('username', username)
+            .single();
+        
+        if (userError || !userData) {
+            alert('Usuário não encontrado');
+            return;
+        }
+        
+        const friend_id = userData.id;
+        
+        // VERIFICA SE JÁ EXISTE SOLICITAÇÃO
+        const { data: existingRequest } = await supabase
+            .from('friends')
+            .select('id, status')
+            .or(`and(user_id.eq.${user_id},friend_id.eq.${friend_id}),and(user_id.eq.${friend_id},friend_id.eq.${user_id})`)
+            .single();
+        
+        if (existingRequest) {
+            if (existingRequest.status === 'pendente') {
+                alert('Já existe uma solicitação pendente com este usuário');
+            } else if (existingRequest.status === 'aceito') {
+                alert('Você já é amigo deste usuário');
+            } else {
+                alert('Já existe uma conexão com este usuário');
+            }
+            return;
+        }
+        
+        // ENVIA SOLICITAÇÃO
+        const { error } = await supabase
+            .from('friends')
+            .insert([{
+                user_id: user_id,
+                friend_id: friend_id,
+                status: 'pendente'
+            }]);
+        
+        if (error) {
+            alert('Erro ao enviar solicitação: ' + error.message);
+            return;
+        }
+        
+        alert(`Solicitação enviada para ${userData.nome} (@${userData.username})!`);
+        document.getElementById('friendUsername').value = '';
+        loadFriends();
+        
+    } catch (err) {
+        console.error('Erro:', err);
+        alert('Erro ao enviar solicitação');
+    }
 }
 
-// Carregar amigos e pendentes
-async function loadFriends(){
-    // Pendentes recebidos
-    const { data: pendings } = await supabase.from('friends').select('id,user_id,friend_id,status,users(nome,username)').eq('friend_id', user_id).eq('status','pendente').order('criado_em',{ascending:false}).limit(20).single();
-    const pendingDiv = document.getElementById('pending-friends');
-    pendingDiv.innerHTML='';
-    const { data: pendingsData } = await supabase.from('friends').select('id,user_id,friend_id,status,users(nome,username)').eq('friend_id', user_id).eq('status','pendente');
-    pendingsData.forEach(p=>{
-        const div = document.createElement('div');
-        div.className='friend';
-        div.innerHTML = `<span>${p.users.nome} (@${p.users.username})</span>
-        <button onclick="acceptFriend(${p.id})">Aceitar</button>
-        <button onclick="rejectFriend(${p.id})">Recusar</button>`;
-        pendingDiv.appendChild(div);
-    });
-
-    // Amigos aceitos
-    const { data: friends } = await supabase.from('friends').select('id,user_id,friend_id,status,users(nome,username)').or(`user_id.eq.${user_id},friend_id.eq.${user_id}`).eq('status','aceito');
-    const friendsDiv = document.getElementById('friends-list');
-    friendsDiv.innerHTML='';
-    friends.forEach(f=>{
-        const friendName = f.user_id==user_id?f.users.nome+' (@'+f.users.username+')':f.users.nome+' (@'+f.users.username+')';
-        const div = document.createElement('div');
-        div.className='friend';
-        div.innerHTML = `<span>${friendName}</span>
-        <button onclick="removeFriend(${f.id})">Remover</button>`;
-        friendsDiv.appendChild(div);
-    });
+// CARREGAR AMIGOS
+async function loadFriends() {
+    try {
+        // SOLICITAÇÕES PENDENTES (recebidas)
+        const { data: pendingRequests, error: pendingError } = await supabase
+            .from('friends')
+            .select(`
+                id,
+                user_id,
+                friend_id,
+                status,
+                criado_em,
+                users!friends_user_id_fkey(nome, sobrenome, username)
+            `)
+            .eq('friend_id', user_id)
+            .eq('status', 'pendente')
+            .order('criado_em', { ascending: false });
+        
+        // AMIGOS ACEITOS
+        const { data: acceptedFriends, error: friendsError } = await supabase
+            .from('friends')
+            .select(`
+                id,
+                user_id,
+                friend_id,
+                status,
+                criado_em,
+                users!friends_user_id_fkey(nome, sobrenome, username),
+                users!friends_friend_id_fkey(nome, sobrenome, username)
+            `)
+            .or(`user_id.eq.${user_id},friend_id.eq.${user_id}`)
+            .eq('status', 'aceito')
+            .order('criado_em', { ascending: false });
+        
+        // SOLICITAÇÕES ENVIADAS (pendentes que você enviou)
+        const { data: sentRequests, error: sentError } = await supabase
+            .from('friends')
+            .select(`
+                id,
+                user_id,
+                friend_id,
+                status,
+                criado_em,
+                users!friends_friend_id_fkey(nome, sobrenome, username)
+            `)
+            .eq('user_id', user_id)
+            .eq('status', 'pendente')
+            .order('criado_em', { ascending: false });
+        
+        if (pendingError || friendsError || sentError) {
+            console.error('Erro ao carregar amigos:', pendingError || friendsError || sentError);
+            alert('Erro ao carregar lista de amigos');
+            return;
+        }
+        
+        // ATUALIZA ESTATÍSTICAS
+        document.getElementById('friends-count').textContent = acceptedFriends ? acceptedFriends.length : 0;
+        document.getElementById('pending-count').textContent = pendingRequests ? pendingRequests.length : 0;
+        document.getElementById('sent-count').textContent = sentRequests ? sentRequests.length : 0;
+        
+        // RENDERIZA SOLICITAÇÕES PENDENTES
+        const pendingDiv = document.getElementById('pending-friends');
+        if (!pendingRequests || pendingRequests.length === 0) {
+            pendingDiv.innerHTML = '<div class="empty-message">Nenhuma solicitação pendente</div>';
+        } else {
+            pendingDiv.innerHTML = '';
+            pendingRequests.forEach(request => {
+                const friendDiv = createFriendItem(
+                    request.users,
+                    'pendente',
+                    request.id,
+                    false,
+                    request.criado_em
+                );
+                pendingDiv.appendChild(friendDiv);
+            });
+        }
+        
+        // RENDERIZA AMIGOS
+        const friendsDiv = document.getElementById('friends-list');
+        if (!acceptedFriends || acceptedFriends.length === 0) {
+            friendsDiv.innerHTML = '<div class="empty-message">Você ainda não tem amigos. Adicione alguns!</div>';
+        } else {
+            friendsDiv.innerHTML = '';
+            acceptedFriends.forEach(friend => {
+                // Determina qual usuário é o amigo (não o usuário atual)
+                const friendData = friend.user_id == user_id ? 
+                    friend['users!friends_friend_id_fkey'] : 
+                    friend['users!friends_user_id_fkey'];
+                
+                const friendDiv = createFriendItem(
+                    friendData,
+                    'aceito',
+                    friend.id,
+                    true,
+                    friend.criado_em
+                );
+                friendsDiv.appendChild(friendDiv);
+            });
+        }
+        
+        // RENDERIZA SOLICITAÇÕES ENVIADAS
+        const sentDiv = document.getElementById('sent-requests');
+        if (!sentRequests || sentRequests.length === 0) {
+            sentDiv.innerHTML = '<div class="empty-message">Nenhuma solicitação enviada</div>';
+        } else {
+            sentDiv.innerHTML = '';
+            sentRequests.forEach(request => {
+                const friendDiv = createFriendItem(
+                    request.users,
+                    'enviada',
+                    request.id,
+                    false,
+                    request.criado_em
+                );
+                sentDiv.appendChild(friendDiv);
+            });
+        }
+        
+    } catch (err) {
+        console.error('Erro:', err);
+        alert('Erro ao carregar amigos');
+    }
 }
 
-// Aceitar amigo
-async function acceptFriend(id){
-    await supabase.from('friends').update({status:'aceito'}).eq('id',id);
-    loadFriends();
+// CRIAR ITEM DE AMIGO
+function createFriendItem(userData, status, friendId, isAccepted, createdAt) {
+    const div = document.createElement('div');
+    div.className = 'friend-item';
+    
+    const userName = `${userData.nome || ''} ${userData.sobrenome || ''}`.trim() || 
+                     userData.username || 'Usuário';
+    const firstLetter = userName.charAt(0).toUpperCase();
+    const friendDate = createdAt ? new Date(createdAt).toLocaleDateString('pt-BR') : '';
+    
+    let actionsHtml = '';
+    if (status === 'pendente') {
+        actionsHtml = `
+            <button class="btn-accept" onclick="acceptFriend(${friendId})">Aceitar</button>
+            <button class="btn-reject" onclick="rejectFriend(${friendId})">Recusar</button>
+        `;
+    } else if (status === 'aceito') {
+        actionsHtml = `<button class="btn-remove" onclick="removeFriend(${friendId})">Remover Amigo</button>`;
+    } else if (status === 'enviada') {
+        actionsHtml = `<button class="btn-cancel" onclick="cancelRequest(${friendId})">Cancelar Solicitação</button>`;
+    }
+    
+    const statusText = status === 'pendente' ? 'Solicitação pendente' :
+                      status === 'aceito' ? 'Amigo' :
+                      status === 'enviada' ? 'Solicitação enviada' : status;
+    
+    div.innerHTML = `
+        <div class="friend-info">
+            <div class="friend-avatar">${firstLetter}</div>
+            <div class="friend-details">
+                <div class="friend-name">${userName}</div>
+                <div class="friend-username">@${userData.username || 'semusuario'}</div>
+                <div class="friend-status status-${status}">${statusText} • ${friendDate}</div>
+            </div>
+        </div>
+        <div class="friend-actions">
+            ${actionsHtml}
+        </div>
+    `;
+    
+    return div;
 }
 
-// Recusar amigo
-async function rejectFriend(id){
-    await supabase.from('friends').delete().eq('id',id);
-    loadFriends();
+// ACEITAR AMIGO
+async function acceptFriend(id) {
+    try {
+        const { error } = await supabase
+            .from('friends')
+            .update({ status: 'aceito' })
+            .eq('id', id);
+        
+        if (error) {
+            alert('Erro ao aceitar solicitação: ' + error.message);
+            return;
+        }
+        
+        alert('Solicitação aceita! Agora vocês são amigos.');
+        loadFriends();
+        
+    } catch (err) {
+        console.error('Erro:', err);
+        alert('Erro ao aceitar solicitação');
+    }
 }
 
-// Remover amigo
-async function removeFriend(id){
-    await supabase.from('friends').delete().eq('id',id);
-    loadFriends();
+// RECUSAR AMIGO
+async function rejectFriend(id) {
+    if (!confirm('Tem certeza que deseja recusar esta solicitação de amizade?')) {
+        return;
+    }
+    
+    try {
+        const { error } = await supabase
+            .from('friends')
+            .delete()
+            .eq('id', id);
+        
+        if (error) {
+            alert('Erro ao recusar solicitação: ' + error.message);
+            return;
+        }
+        
+        alert('Solicitação recusada.');
+        loadFriends();
+        
+    } catch (err) {
+        console.error('Erro:', err);
+        alert('Erro ao recusar solicitação');
+    }
 }
 
-loadFriends();
+// REMOVER AMIGO
+async function removeFriend(id) {
+    if (!confirm('Tem certeza que deseja remover este amigo?')) {
+        return;
+    }
+    
+    try {
+        const { error } = await supabase
+            .from('friends')
+            .delete()
+            .eq('id', id);
+        
+        if (error) {
+            alert('Erro ao remover amigo: ' + error.message);
+            return;
+        }
+        
+        alert('Amigo removido.');
+        loadFriends();
+        
+    } catch (err) {
+        console.error('Erro:', err);
+        alert('Erro ao remover amigo');
+    }
+}
+
+// CANCELAR SOLICITAÇÃO ENVIADA
+async function cancelRequest(id) {
+    if (!confirm('Tem certeza que deseja cancelar esta solicitação?')) {
+        return;
+    }
+    
+    try {
+        const { error } = await supabase
+            .from('friends')
+            .delete()
+            .eq('id', id);
+        
+        if (error) {
+            alert('Erro ao cancelar solicitação: ' + error.message);
+            return;
+        }
+        
+        alert('Solicitação cancelada.');
+        loadFriends();
+        
+    } catch (err) {
+        console.error('Erro:', err);
+        alert('Erro ao cancelar solicitação');
+    }
+}
+
+// INICIALIZAR
+window.addEventListener('DOMContentLoaded', loadFriends);
 </script>
 
 </body>
